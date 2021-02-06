@@ -14,6 +14,7 @@ module.exports = {
   },
   devOptions: {
     /* ... */
+	  hmr: true,
   },
   buildOptions: {
     /* ... */
