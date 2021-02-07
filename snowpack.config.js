@@ -15,8 +15,9 @@ module.exports = {
   devOptions: {
     /* ... */
 	  hmr: true,
+	  open: "none",
   },
   buildOptions: {
-    /* ... */
+	  baseUrl: "/",
   },
 };

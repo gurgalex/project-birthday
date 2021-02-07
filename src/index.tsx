@@ -2,7 +2,9 @@ import * as React from 'react';
 import ReactDOM from "react-dom";
 
 import { get, set } from 'idb-keyval';
-import {useEffect} from "react";
+import {useEffect, useReducer, useState} from "react";
+
+import {Link, Route, Router, Switch} from "wouter";
 
 
 const enum appAction {
@@ -14,9 +16,10 @@ const enum appAction {
 
 export class App extends React.Component {
     public state: {
-        birthDay: Date,
+        settings: {birthDay: Date},
         status: appAction,
     };
+
 
     getDateFromStorage(): Promise<unknown> {
         return get('date-iso').then(day => {
@@ -32,34 +35,66 @@ export class App extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {birthDay: null, status: appAction.LOADING};
+        this.state = {settings: {birthDay: null}, status: appAction.LOADING};
         console.debug(`App State with init:`);
         console.log(this);
     }
 
     componentDidMount() {
         this.getDateFromStorage().then(date => {
-            this.setState({birthDay: date, status: appAction.SETTINGS});
+            this.setState({settings: {birthDay: date}, status: appAction.HOME});
         })
     }
 
     render() {
-        let settingsPage;
+        let content;
+        return (
+            <>
+                <Router hook={useHashLocation}>
+                <Switch>
+                <Route path="/settings">
+                    {() =>
+                        <>
+                            <Settings />
+                            </>
+                        }
+                </Route>
+
+                <Route path="/">
+                    {() => {
+                        const settings = this.state.settings
+                        return (
+                        <MainPageContent settings={settings}/>
+                        );
+                    }
+                    }
+                </Route>
+
+                <Route>404, Not Found!</Route>
+                </Switch>
+                </Router>
+            </>
+        );
+
         switch (this.state.status) {
             case appAction.HOME: {
+                console.debug(`Loading HOME componenent switch`);
+                console.debug(this.state.settings);
+                let settings = this.state.settings;
+                content = <MainPageContent settings={settings}/>
                 break;
             }
             case appAction.SETTINGS:
-                settingsPage = <Settings birthDay={this.state.birthDay} onSettingsSubmit={this.handleFormSubmit}/>;
+                content = <Settings birthDay={this.state.settings.birthDay} onSettingsSubmit={this.handleFormSubmit}/>;
                 break;
             case appAction.LOADING:
-                settingsPage = null;
+                content = null;
         }
 
         return (
         <React.Fragment>
             <h1>Hello {this.props.name}</h1>
-            {settingsPage}
+            {content}
         </React.Fragment>
         );
     }
@@ -82,7 +117,7 @@ export class App extends React.Component {
         console.debug("updated birthDay in app");
 
         set('date-iso', birthDate).then(res => {
-                //console.debug("Set birth date in idb");
+                console.debug("Set birth date in idb");
             }
         ).catch(err => {
             switch (err.name) {
@@ -98,7 +133,39 @@ export class App extends React.Component {
 
 }
 
+interface appProps {
+    settings: {birthDate: Date},
+}
+
+const MainPageContent = (props: Partial<appProps>) => {
+    console.log(props);
+    if (props.settings.birthDate) {
+        return (
+            <>
+                <p>Welcome your name is Alex-TBD</p>
+                <p>Your birthday is: {props.settings.birthDay.toLocaleDateString()}</p>
+            </>
+        )
+    }
+    else {
+        return (
+            <>
+            <p>Welcome, it looks like you haven't setup your birthday reminder yet. Click the setup button to get started.</p>
+                <Link href="/settings">
+            <button>Setup Birthday</button>
+                </Link>
+            </>
+        )
+    }
+}
+
 const Settings = (props) => {
+    const enum SettingsStates {
+
+    }
+    
+    const [state, dispatch] = useReducer(settingsReducer);
+
     const birthDaySet = props.birthDay;
     let birthDayGreeting;
     if (birthDaySet) {
@@ -128,8 +195,42 @@ const Settings = (props) => {
 
 }
 
+const enum settingsAction {
+    LOADING = "Loading",
+    EDIT = "Edit",
+    SAVE = 'Save',
+}
+
+function settingsReducer(state, action: settingsAction) {
+
+}
+
 
 export default App;
+
+// Hash routing
+// returns the current hash location in a normalized form
+// (excluding the leading '#' symbol)
+const currentLocation = () => {
+    return window.location.hash.replace(/^#/, "") || "/";
+};
+
+const navigate = (to) => (window.location.hash = to);
+
+const useHashLocation = () => {
+    const [loc, setLoc] = useState(currentLocation());
+
+    useEffect(() => {
+        // this function is called whenever the hash changes
+        const handler = () => setLoc(currentLocation());
+
+        // subscribe to hash changes
+        window.addEventListener("hashchange", handler);
+        return () => window.removeEventListener("hashchange", handler);
+    }, []);
+
+    return [loc, navigate];
+};
 
 const root = document.getElementById('app');
 
