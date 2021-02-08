@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+  "forceConsistentCasingInFileNames": true,
+  "noImplicitReturns": true,
+  "strict": true,
+    "baseUrl": ".",
+    "target": "ESNext",
+    "module": "ESNext",
+    "paths": {
+      "*": [".snowpack/types/*"],
+      "/": ["src/*"]
+    },
+    "jsx": "react"
+  }
+}
