@@ -6,68 +6,6 @@ import {useHashLocation} from "./hashRouteHook";
 import {Settings} from "./Settings";
 import {Home} from "./Home";
 
-export const enum appStatus {
-    LOADING = "Loading",
-    HOME = "Home",
-    SETTINGS = "Settings",
-}
-
-export interface appState {
-    settings: { birthDay: Date | null }
-    status: appStatus
-    warnStorage: boolean
-}
-
-export const enum appActionType {
-    HOME,
-    SAVE,
-    EnableStorageFailureWarning,
-    SETTINGS,
-    SWITCH_TO_HOME,
-}
-
-export interface appAction {
-    type: appActionType,
-    payload: any,
-}
-
-function appReducer(state, action: appAction) {
-    switch (action.type) {
-        case appActionType.SAVE:
-            console.debug("request to save new birthDay");
-            let newDay = action.payload.birthDay;
-            console.debug(newDay);
-            console.debug(state);
-            return {...state, settings: {birthDay: newDay}, status: appStatus.SETTINGS};
-        case appActionType.HOME:
-            console.debug("Switch to Home page");
-            return {...state, status: appStatus.HOME, settings: action.payload.settings};
-        case appActionType.SETTINGS:
-            console.debug("Switch to Settings page");
-            return {...state, status: appStatus.SETTINGS};
-        case appActionType.EnableStorageFailureWarning:
-            console.warn("Writing or reading failed");
-            return {...state, warnStorage: true};
-        case appActionType.SWITCH_TO_HOME:
-            return {...state, status: appStatus.HOME};
-
-        default:
-            console.error("unhandled app action");
-            console.error(state);
-            console.error(action);
-    }
-}
-
-function getDateFromStorage(): Promise<Date | undefined> {
-    return get('date-iso').then((day: Date) => {
-        console.debug(`Got day from idb init: ${day}`);
-        return {birthDay: day};
-    }).catch(err => {
-        console.warning("Failed to get date from local storage");
-    });
-
-}
-
 const App = () => {
     const initialAppState: appState = {settings: {birthDay: null}, status: appStatus.LOADING, warnStorage: false};
     const [state, appDispatch] = useReducer(appReducer, initialAppState);
@@ -137,6 +75,70 @@ const App = () => {
         </>
     );
 }
+
+function appReducer(state, action: appAction) {
+    switch (action.type) {
+        case appActionType.SAVE:
+            console.debug("request to save new birthDay");
+            let newDay = action.payload.birthDay;
+            console.debug(newDay);
+            console.debug(state);
+            return {...state, settings: {birthDay: newDay}, status: appStatus.SETTINGS};
+        case appActionType.HOME:
+            console.debug("Switch to Home page");
+            return {...state, status: appStatus.HOME, settings: action.payload.settings};
+        case appActionType.SETTINGS:
+            console.debug("Switch to Settings page");
+            return {...state, status: appStatus.SETTINGS};
+        case appActionType.EnableStorageFailureWarning:
+            console.warn("Writing or reading failed");
+            return {...state, warnStorage: true};
+        case appActionType.SWITCH_TO_HOME:
+            return {...state, status: appStatus.HOME};
+
+        default:
+            console.error("unhandled app action");
+            console.error(state);
+            console.error(action);
+    }
+}
+
+export interface appState {
+    settings: { birthDay: Date | null }
+    status: appStatus
+    warnStorage: boolean
+}
+
+export const enum appStatus {
+    LOADING = "Loading",
+    HOME = "Home",
+    SETTINGS = "Settings",
+}
+
+export interface appAction {
+    type: appActionType,
+    payload: any,
+}
+
+export const enum appActionType {
+    HOME,
+    SAVE,
+    EnableStorageFailureWarning,
+    SETTINGS,
+    SWITCH_TO_HOME,
+}
+
+
+function getDateFromStorage(): Promise<Date | undefined> {
+    return get('date-iso').then((day: Date) => {
+        console.debug(`Got day from idb init: ${day}`);
+        return {birthDay: day};
+    }).catch(err => {
+        console.warning("Failed to get date from local storage");
+    });
+
+}
+
 const warningStyle = {
     backgroundColor: "#9c2b2e",
     color: "white",
