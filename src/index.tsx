@@ -1,10 +1,14 @@
 import * as React from 'react';
 import ReactDOM from "react-dom";
+//import * as React from 'https://unpkg.com/react@17/umd/react.development.js?module';
+//import "https://unpkg.com/react-dom@17/umd/react-dom.development.js?module";
+
 
 import {get, set} from 'idb-keyval';
 import {useEffect, useReducer, useState} from "react";
 
-import {Link, Route, Router, Switch} from "wouter";
+import {Link, Route, Router, Switch, Redirect} from "wouter";
+
 
 const enum appStatus {
     LOADING = "Loading",
@@ -34,16 +38,16 @@ interface appAction {
 function appReducer(state, action: appAction) {
     switch (action.type) {
         case appActionType.SAVE:
-            console.log("request to save new birthDay");
+            console.debug("request to save new birthDay");
             let newDay = action.payload.birthDay;
-            console.log(newDay);
-            console.log(state);
+            console.debug(newDay);
+            console.debug(state);
             return {...state, settings: {birthDay: newDay}, status: appStatus.SETTINGS};
         case appActionType.HOME:
-            console.log("Switch to Home page");
+            console.debug("Switch to Home page");
             return {...state, status: appStatus.HOME, settings: action.payload.settings};
         case appActionType.SETTINGS:
-            console.log("Switch to Settings page");
+            console.debug("Switch to Settings page");
             return {...state, status: appStatus.SETTINGS};
         case appActionType.EnableStorageFailureWarning:
             console.warn("Writing or reading failed");
@@ -76,8 +80,8 @@ const AppNew = () => {
     // load data
     useEffect(() => {
         getDateFromStorage().then(settings => {
-            console.log("got settings");
-            console.log(settings);
+            console.debug("got settings from idb");
+            console.debug(settings);
             appDispatch({type: appActionType.HOME, payload: {settings: settings}});
         }).catch(err => {
             console.error(`Unhandled error when setting key with indexedDB: ${err.name}`);
@@ -86,23 +90,20 @@ const AppNew = () => {
             appDispatch({type: 'enableStorageFailureWarning'});
             appDispatch({type: 'Home', payload: initialAppState.settings});
             throw err;
-            //Update status from loading -> Home
         });
     }, []);
 
     // render
-    console.log("app state");
-    console.log(state);
+    console.debug("app state");
+    console.debug(state);
     if (state.status === appStatus.LOADING) {
-        console.log("app in loading state");
+        console.debug("app in loading state");
         return null;
     }
 
 
     return (
         <>
-            {state.warnStorage && warningContent}
-
             <Router hook={useHashLocation}>
                 <nav>
                     <Link href="/" onClick={() => appDispatch({type: appActionType.SWITCH_TO_HOME})}>
@@ -113,10 +114,11 @@ const AppNew = () => {
                     </Link>
                 </nav>
 
+                {state.warnStorage && warningStorageContent}
+
                 <Switch>
                     <Route path="/settings">
                         {() => {
-                            console.log("settings router");
                             return (
                                 <>
                                     <Settings settings={state.settings} dispatch={appDispatch}/>
@@ -127,7 +129,6 @@ const AppNew = () => {
 
                     <Route path="/">
                         {() => {
-                            console.log("home router");
                             const settings = state.settings;
                             return (
                                 <MainPageContent settings={settings}/>
@@ -152,14 +153,14 @@ interface appProps {
 }
 
 
-const warningContent = <>
+const warningStorageContent = <>
     <section id="warning" style={warningStyle}><h2>Warning: Not enough space on your device</h2> <p><b>App will operate
         in read only mode.</b></p></section>
 </>
 
 const MainPageContent = (props: Partial<appProps>) => {
-    console.log("main page initial props");
-    console.log(props);
+    console.debug("main page initial props");
+    console.debug(props);
     if (props.settings.birthDay) {
         return (
             <>
@@ -188,8 +189,9 @@ const MainPageContent = (props: Partial<appProps>) => {
 
 const Settings = (props) => {
 
-    console.log("settings props");
-    console.log(props);
+    const [filled, setFilled] = useState(false);
+    console.debug("settings props");
+    console.debug(props);
     const birthDaySet = props.settings.birthDay;
     let birthDayGreeting;
     if (birthDaySet) {
@@ -212,9 +214,10 @@ const Settings = (props) => {
         const birthDay = birthDayInput.valueAsDate;
 
         set('date-iso', birthDay).then(res => {
-                console.debug("Set birth day in idb");
+                console.debug("Set birthDay in idb");
                 props.dispatch({type: appActionType.SAVE, payload: {birthDay}})
-                console.debug("updated birthDay in app");
+                console.debug("Set birthDay in app");
+                props.dispatch({type: appActionType.SWITCH_TO_HOME});
             }
         ).catch(err => {
             switch (err.name) {
@@ -224,26 +227,28 @@ const Settings = (props) => {
                     break;
                 default:
                     console.error(`Unhandled error when setting key with indexedDB: ${err.name}`);
-                    console.log(JSON.stringify(err));
+                    console.error(JSON.stringify(err));
                     throw err;
             }
         });
     };
 
     return (
-        <React.Fragment>
+        <>
+            {filled && <Redirect to="/" />}
             {birthDayGreeting}
             <form id="form-settings">
                 <label for="set-birthday">Next birthday</label>
                 <input name="birth-date" id="set-birthday" type="date" required/>
 
-                <button type="submit">Save Settings</button>
+                    <button onClick={() => setFilled(true)} type="submit">Save Settings</button>
             </form>
-        </React.Fragment>)
+        </>)
 }
 
 
 export default AppNew;
+
 
 // Hash routing
 // returns the current hash location in a normalized form
