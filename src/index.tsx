@@ -6,7 +6,6 @@ import {useEffect, useReducer, useState} from "react";
 
 import {Link, Route, Router, Switch} from "wouter";
 
-
 const enum appStatus {
     LOADING = "Loading",
     HOME = "Home",
@@ -103,23 +102,25 @@ const AppNew = () => {
     return (
         <>
             {state.warnStorage && warningContent}
-            <nav>
-                <Link href="/" onClick={() => appDispatch({type: appActionType.SWITCH_TO_HOME})} componenet={AppNew}>
-                <a rel="noreferrer noopener">Home</a>
-            </Link>
-                <Link href="/#/settings" onClick={() => appDispatch({type: appActionType.SETTINGS})} componenet={AppNew}>
-                    <a rel="noreferrer noopener">Settings</a>
-                </Link>
-            </nav>
 
             <Router hook={useHashLocation}>
+                <nav>
+                    <Link href="/" onClick={() => appDispatch({type: appActionType.SWITCH_TO_HOME})}>
+                        <a rel="noreferrer noopener">Home</a>
+                    </Link>
+                    <Link href="/settings" onClick={() => appDispatch({type: appActionType.SETTINGS})}>
+                        <a rel="noreferrer noopener">Settings</a>
+                    </Link>
+                </nav>
+
+                <Switch>
                     <Route path="/settings">
                         {() => {
                             console.log("settings router");
                             return (
                                 <>
-                                <Settings settings={state.settings} dispatch={appDispatch}/>
-                            </>)
+                                    <Settings settings={state.settings} dispatch={appDispatch}/>
+                                </>)
                         }
                         }
                     </Route>
@@ -135,8 +136,8 @@ const AppNew = () => {
                         }
                     </Route>
 
-                    <Route>404, Not Found!</Route>
-            </Router>
+                    <Route>404, Page Not Found!</Route>
+                </Switch> </Router>
         </>
     );
 }
@@ -152,7 +153,9 @@ interface appProps {
 
 
 const warningContent = <>
-<section id="warning" style={warningStyle}><h2>Warning: Not enough space on your device</h2> <p><b>App will operate in read only mode.</b></p></section></>
+    <section id="warning" style={warningStyle}><h2>Warning: Not enough space on your device</h2> <p><b>App will operate
+        in read only mode.</b></p></section>
+</>
 
 const MainPageContent = (props: Partial<appProps>) => {
     console.log("main page initial props");
@@ -238,7 +241,6 @@ const Settings = (props) => {
             </form>
         </React.Fragment>)
 }
-
 
 
 export default AppNew;
