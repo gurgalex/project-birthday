@@ -34,16 +34,21 @@ const App = () => {
         return null;
     }
 
+    const markActive = `aria-current='page'`;
+    const linkProps = {
+        "aria-current": "page",
+    };
 
     return (
         <>
             <Router hook={useHashLocation}>
                 <nav>
+                    {/*There is certainly a less repetitive way to determine the active page*/}
                     <Link href="/" onClick={() => appDispatch({type: appActionType.SWITCH_TO_HOME})}>
-                        <a id="home-link" rel="noreferrer noopener">Home</a>
+                        <a id="home-link" {...(state.status === appStatus.HOME ? {'aria-current': 'page'} : {})} rel="noreferrer noopener">Home</a>
                     </Link>
                     <Link href="/settings" onClick={() => appDispatch({type: appActionType.SETTINGS})}>
-                        <a id="settings-link" rel="noreferrer noopener">Settings</a>
+                        <a id="settings-link" {...(state.status === appStatus.SETTINGS ? {'aria-current': 'page'} : {})} rel="noreferrer noopener">Settings</a>
                     </Link>
                 </nav>
 

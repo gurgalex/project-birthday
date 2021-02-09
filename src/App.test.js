@@ -35,6 +35,14 @@ describe('App', () => {
         await page.waitForSelector("#home-greeting");
     });
 
+    it("The currently viewed page is the shown as active in the navigation list", async () => {
+        await page.goto(site.home);
+       await page.waitForSelector("nav [aria-current='page']");
+       // make sure it matches the current page
+        let activeLink = await page.$("nav [aria-current='page']");
+        let activeLinkId = await activeLink.evaluate(el => el.id);
+        expect(activeLinkId).to.eq("home-link");
+    });
 
     it("Prompt the user to setup their birthday if they have not used the site before", async () => {
         await page.waitForSelector("#no-settings-greeting");
