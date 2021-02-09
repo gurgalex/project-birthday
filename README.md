@@ -15,3 +15,4 @@ Get notified in the browser when your next birthday is.
      - Change current URL in response to actions (Redirect)
      - Went with hash-based "/#/" routing since it requires no server configuration
 - Jest - Testing some apps and getting familar with testing in JS
+- Puppeteer - Automated testing of expected user interaction with the site
