@@ -53,6 +53,7 @@ export const Settings = (props) => {
     return (
         <>
             {filled && <Redirect to="/"/>}
+            <h1 id="settings-header">Settings</h1>
             {birthDayGreeting}
             <form id="form-settings">
                 <label for="set-birthday">Next birthday</label>

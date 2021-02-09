@@ -40,10 +40,10 @@ const App = () => {
             <Router hook={useHashLocation}>
                 <nav>
                     <Link href="/" onClick={() => appDispatch({type: appActionType.SWITCH_TO_HOME})}>
-                        <a rel="noreferrer noopener">Home</a>
+                        <a id="home-link" rel="noreferrer noopener">Home</a>
                     </Link>
                     <Link href="/settings" onClick={() => appDispatch({type: appActionType.SETTINGS})}>
-                        <a rel="noreferrer noopener">Settings</a>
+                        <a id="settings-link" rel="noreferrer noopener">Settings</a>
                     </Link>
                 </nav>
 

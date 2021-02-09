@@ -8,10 +8,10 @@ export const Home = (props: Partial<appProps>) => {
     if (props.settings.birthDay) {
         return (
             <>
-                <p>Welcome to the birthday reminder app!</p>
-                <p>Your birthday is: {props.settings.birthDay.toLocaleDateString()}</p>
+                <p id="home-greeting">Welcome to the birthday reminder app!</p>
+                <p id="when-next-birthday" data-date={props.settings?.birthDay.toISOString()}>Your birthday is: {props.settings.birthDay.toLocaleDateString()}</p>
 
-                <p>Click the below button to edit your birthday</p>
+                <p>Click the setup button to set a reminder.</p>
                 <Link href="/settings">
                     <button>Setup Birthday</button>
                 </Link>
@@ -21,11 +21,13 @@ export const Home = (props: Partial<appProps>) => {
     } else {
         return (
             <>
-                <p>Welcome, it looks like you haven't setup your birthday reminder yet. Click the setup button to get
-                    started.</p>
-                <Link href="/settings">
-                    <button>Setup Birthday</button>
-                </Link>
+                <section id="no-settings-greeting">
+                    <p id="home-greeting">Welcome! It looks like you haven't setup your birthday reminder yet.</p>
+                    <p>Click the setup button to set a reminder.</p>
+                    <Link href="/settings">
+                        <button id="settings-setup-btn">Setup Birthday</button>
+                    </Link>
+                </section>
             </>
         )
     }

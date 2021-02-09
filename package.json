@@ -4,7 +4,7 @@
   "description": "Notify user when it is their birthday",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "mocha --recursive 'src/*.test.js' --require esm"
   },
   "keywords": [
     "birthday",
@@ -13,24 +13,18 @@
   "author": "Alex Gurganus",
   "license": "ISC",
   "dependencies": {
-    "@swc/core": "^1.2.47",
-    "htm": "^3.0.4",
-    "idb": "^6.0.0",
     "idb-keyval": "^5.0.2",
-    "preact": "^10.5.12",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "react-router-dom": "^5.2.0",
     "wouter": "^2.7.3"
   },
   "devDependencies": {
-    "@babel/preset-typescript": "^7.12.13",
-    "@types/jest": "^26.0.20",
-    "babel-jest": "^26.6.3",
-    "htm": "^3.0.4",
-    "jest": "^26.6.3",
+    "puppeteer": "^7.0.1",
+    "@types/puppeteer": "^5.4.3",
+    "chai": "^4.3.0",
+    "esm": "^3.2.25",
+    "mocha": "^8.2.1",
     "regenerator-runtime": "^0.13.7",
-    "ts-jest": "^26.5.0",
     "typescript": "^4.1.3"
   }
 }

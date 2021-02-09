@@ -1,12 +1,14 @@
 {
   "dependencies": {
     "idb-keyval": "^5.0.2",
+    "puppeteer": "^7.0.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "wouter": "^2.7.3"
   },
   "lock": {
     "idb-keyval#^5.0.2": "idb-keyval@v5.0.2-ZYYp7MRnTcHOG7uSjn7K",
+    "puppeteer#^7.0.1": "puppeteer@v7.0.1-PheXVPO8WB2A61N0o8On",
     "react#^17.0.1": "react@v17.0.1-tOtrZxBRexARODgO0jli",
     "react-dom#^17.0.1": "react-dom@v17.0.1-DtIXT56q6U8PbgLMrBhE",
     "wouter#^2.7.3": "wouter@v2.7.3-NRF4gd0svLgKOZC8qcmy"
