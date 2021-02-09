@@ -12,7 +12,7 @@ export const Home = (props: Partial<appProps>) => {
                 <p id="when-next-birthday" data-date={props.settings?.birthDay.toISOString()}>Your birthday is: {props.settings.birthDay.toLocaleDateString()}</p>
 
                 <Link href="/settings">
-                    <button>Setup Reminder</button>
+                    <a className="btn" id="settings-setup-btn">Change Reminder</a>
                 </Link>
 
             </>
@@ -23,7 +23,7 @@ export const Home = (props: Partial<appProps>) => {
                 <section id="no-settings-greeting">
                     <p id="home-greeting">Welcome! It looks like you haven't setup your birthday reminder yet.</p>
                     <Link href="/settings">
-                        <button id="settings-setup-btn">Setup Reminder</button>
+                        <a className="btn" id="settings-setup-btn">Setup Reminder</a>
                     </Link>
                 </section>
             </>

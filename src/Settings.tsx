@@ -10,12 +10,14 @@ export const Settings = (props) => {
     console.debug("settings props");
     console.debug(props);
     const birthDaySet = props.settings.birthDay;
-    let birthDayGreeting;
-    if (birthDaySet) {
-        birthDayGreeting = <p>Your birthday is {props.settings.birthDay.toLocaleDateString()}</p>
-    } else {
-        birthDayGreeting = <p>Set your birthday below.</p>
-    }
+
+    const settingsGreeting = () => {
+        if (birthDaySet) {
+            return <p>Your birthday is {props.settings.birthDay.toLocaleDateString()}</p>
+        } else {
+            return <p>Set your first birthday reminder</p>
+        }
+    };
 
     useEffect(() => {
         const settingFormElement = document.getElementById('form-settings');
@@ -54,7 +56,7 @@ export const Settings = (props) => {
         <>
             {filled && <Redirect to="/"/>}
             <h1 id="settings-header">Settings</h1>
-            {birthDayGreeting}
+            {settingsGreeting()}
             <form id="form-settings">
                 <label for="set-birthday">Next birthday</label>
                 <input name="birth-date" id="set-birthday" type="date" required/>
