@@ -39,6 +39,9 @@ export const Settings = (props) => {
                 console.debug("Set birthDay in app");
                 setFilled(true);
                 console.debug("form marked as filled in settings");
+                props.dispatch({type: appActionType.SWITCH_TO_HOME});
+                console.debug("Should be in home status now");
+                console.debug(props);
             }
         ).catch(err => {
             switch (err.name) {
@@ -56,7 +59,7 @@ export const Settings = (props) => {
 
     return (
         <>
-            {filled && <Redirect to="/"/>}
+            {filled && <Redirect to ="/"/>}
             <h1 id="settings-header">Settings</h1>
             {settingsGreeting()}
             <form id="form-settings">

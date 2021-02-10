@@ -1,12 +1,13 @@
 import {get} from "idb-keyval";
 import * as React from "react";
 import {useEffect, useReducer} from "react";
-import {Link, Route, Router, Switch, useRoute} from "wouter";
+import {Route, Router, Switch} from "wouter";
 import {useHashLocation} from "./hashRouteHook";
 import {Settings} from "./Settings";
 import {Home} from "./Home";
 import {appActionType, appReducer, appState, appStatus} from "./appActions";
-import {appRoutes} from "./routes";
+import {appRoutes, navRoutes} from "./routes";
+import {NavBar} from './NavBar';
 
 const App = () => {
     const initialAppState: appState = {settings: {birthDay: null}, status: appStatus.LOADING, warnStorage: false};
@@ -53,22 +54,10 @@ const App = () => {
         return null;
     }
 
-    const activeLinkProps = {
-        "aria-current": "page",
-    };
-
     return (
         <>
             <Router hook={useHashLocation}>
-                <nav>
-                    {/*There is certainly a less repetitive way to determine the active page*/}
-                    <Link href={appRoutes.HOME} onClick={() => appDispatch({type: appActionType.SWITCH_TO_HOME})}>
-                        <a id="home-link" {...(state.status === appStatus.HOME ? activeLinkProps : {})} rel="noreferrer noopener">Home</a>
-                    </Link>
-                    <Link href={appRoutes.SETTINGS} onClick={() => appDispatch({type: appActionType.SETTINGS})}>
-                        <a id="settings-link" {...(state.status === appStatus.SETTINGS ? activeLinkProps : {})} rel="noreferrer noopener">Settings</a>
-                    </Link>
-                </nav>
+                <NavBar routes={navRoutes} appDispatch={appDispatch}/>
 
                 {state.warnStorage && warningStorageContent}
 
