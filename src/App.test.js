@@ -1,6 +1,6 @@
-//const puppeteer = require('puppeteer');
 import puppeteer from "puppeteer";
 import { expect } from 'chai';
+import HomePage from "./testPOM/Home";
 
 // puppeteer options
 const opts = {
@@ -10,7 +10,7 @@ const opts = {
 };
 
 // testing local options
-const base = "http://localhost:8080";
+const base = "https://localhost:8080";
 const site = {
     home: `${base}/#/`,
     settings: `${base}/#/settings`,
@@ -19,7 +19,9 @@ const site = {
 describe('App', () => {
 
     before(async () => {
+        // @ts-ignore
         global.browser = await puppeteer.launch(opts);
+        // @ts-ignore
         global.page = await browser.newPage();
         page.setDefaultTimeout(5000);
         console.log("Launch the global browser");
@@ -31,13 +33,13 @@ describe('App', () => {
     });
 
     it("The homepage loads", async () => {
-        await page.goto(site.home);
-        await page.waitForSelector("#home-greeting");
+        const home = new HomePage(page);
+        await home.go();
     });
 
     it("The currently viewed page is shown as active in the navigation list", async () => {
         await page.goto(site.home);
-       await page.waitForSelector("nav [aria-current='page']");
+        await page.waitForSelector("nav [aria-current='page']");
        // make sure it matches the current page
         let activeLink = await page.$("nav [aria-current='page']");
         let activeLinkId = await activeLink.evaluate(el => el.id);
