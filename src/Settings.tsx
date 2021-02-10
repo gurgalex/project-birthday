@@ -13,7 +13,7 @@ export const Settings = (props) => {
 
     const settingsGreeting = () => {
         if (birthDaySet) {
-            return <p>Your birthday is {props.settings.birthDay.toLocaleDateString()}</p>
+            return <p>Your next birthday reminder is on {props.settings.birthDay.toLocaleDateString()}</p>
         } else {
             return <p>Set your first birthday reminder</p>
         }
@@ -58,7 +58,7 @@ export const Settings = (props) => {
             <h1 id="settings-header">Settings</h1>
             {settingsGreeting()}
             <form id="form-settings">
-                <label for="set-birthday">Next birthday</label>
+                <label for="set-birthday">Set reminder to</label>
                 <input name="birth-date" id="set-birthday" type="date" required/>
 
                 <button onClick={() => setFilled(true)} type="submit">Save Settings</button>
