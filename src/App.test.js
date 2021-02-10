@@ -1,6 +1,8 @@
-//const puppeteer = require('puppeteer');
 import puppeteer from "puppeteer";
 import { expect } from 'chai';
+import HomePage from "./testPOM/Home";
+import NavHeader from "./testPOM/Nav";
+import {SettingsPage} from "./testPOM/Settings";
 
 // puppeteer options
 const opts = {
@@ -10,7 +12,7 @@ const opts = {
 };
 
 // testing local options
-const base = "http://localhost:8080";
+const base = "https://localhost:8080";
 const site = {
     home: `${base}/#/`,
     settings: `${base}/#/settings`,
@@ -19,7 +21,9 @@ const site = {
 describe('App', () => {
 
     before(async () => {
+        // @ts-ignore
         global.browser = await puppeteer.launch(opts);
+        // @ts-ignore
         global.page = await browser.newPage();
         page.setDefaultTimeout(5000);
         console.log("Launch the global browser");
@@ -31,25 +35,38 @@ describe('App', () => {
     });
 
     it("The homepage loads", async () => {
-        await page.goto(site.home);
-        await page.waitForSelector("#home-greeting");
+        const home = new HomePage(page);
+        await home.go();
     });
 
+    it("The currently viewed page is shown as active in the navigation list", async () => {
+        const home = new HomePage(page);
+        let currentPageNavID = await home.navHeader.activeNavID();
+        expect(currentPageNavID).to.eq(NavHeader.homeNavID);
+});
+    it("Changing to and from settings using nav links keeps correct active link", async () => {
+        const home = new HomePage(page);
+        const nav = home.navHeader;
+        await nav.clickSettings();
+        expect(await nav.activeNavID()).to.eq(NavHeader.settingsNavID);
+        await nav.clickHome();
+        expect(await nav.activeNavID()).to.eq(NavHeader.homeNavID);
+    })
 
     it("Prompt the user to setup their birthday if they have not used the site before", async () => {
-        await page.waitForSelector("#no-settings-greeting");
+        const home = new HomePage(page);
+        await home.firstTimeSetupGreetingElement();
     });
 
     it('Show an edit settings button on the home page', async () => {
-        await page.waitForSelector("#settings-setup-btn");
-        const element = await page.$("#settings-setup-btn");
-        const result = await page.evaluate(el => el.textContent, element)
-        expect(result).to.equal("Setup Birthday");
+        const home = new HomePage(page);
+        const settingsElement = await home.changeSettingsBtnElement();
+        expect(settingsElement).to.not.eq(null);
     });
 
     it('Navigate to the Settings page when clicking the setup button', async () => {
-        await page.waitForSelector("#settings-setup-btn");
-        let setupSettingsBtn = await page.$("#settings-setup-btn");
+        const home = new HomePage(page);
+        const setupSettingsBtn = await home.changeSettingsBtnElement();
         await setupSettingsBtn.click();
         await page.waitForSelector('#settings-header');
         expect(await page.url()).to.equal(site.settings);
@@ -75,15 +92,17 @@ describe('App', () => {
 
 
     it('Saving your birthday reminder navigates to the homepage with the new birthday', async () => {
-        await page.goto(site.settings);
-        await page.waitForSelector('#set-birthday');
-        let setBirthdayInput = await page.$("#set-birthday");
-        await setBirthdayInput.type("01/23/2022");
-        await page.keyboard.press("Enter");
-        await page.waitForSelector('#when-next-birthday');
+        const changeSettingsPage = new SettingsPage(page);
+        await changeSettingsPage.go();
+        let currentDayOnly = new Date();
+        currentDayOnly.setUTCHours(0,0,0,0);
+
+        await changeSettingsPage.fillInBirthDay(currentDayOnly);
+        let home = await changeSettingsPage.submitBirthDay();
+        let homeDateString = await home.getBirthdayReminderISODate();
         await expect(page.url()).to.eq(site.home);
-        let homeWhenBirthday = await page.$("#when-next-birthday");
-        let homeDateString = await homeWhenBirthday.evaluate(el => el.dataset.date);
-        expect(homeDateString).to.eq("2022-01-23T00:00:00.000Z");
+        expect(await home.navHeader.activeNavID()).to.eq(NavHeader.homeNavID);
+        expect(homeDateString).to.eq(currentDayOnly.toISOString());
+
     });
 })

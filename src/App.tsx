@@ -1,10 +1,13 @@
 import {get} from "idb-keyval";
 import * as React from "react";
 import {useEffect, useReducer} from "react";
-import {Link, Route, Router, Switch} from "wouter";
+import {Route, Router, Switch} from "wouter";
 import {useHashLocation} from "./hashRouteHook";
 import {Settings} from "./Settings";
 import {Home} from "./Home";
+import {appActionType, appReducer, appState, appStatus} from "./appActions";
+import {appRoutes, navRoutes} from "./routes";
+import {NavBar} from './NavBar';
 
 const App = () => {
     const initialAppState: appState = {settings: {birthDay: null}, status: appStatus.LOADING, warnStorage: false};
@@ -13,18 +16,35 @@ const App = () => {
     // load data
     useEffect(() => {
         getDateFromStorage().then(settings => {
-            console.debug("got settings from idb");
+            console.debug("got birthDay setting from idb");
             console.debug(settings);
-            appDispatch({type: appActionType.HOME, payload: {settings: settings}});
+            appDispatch({type: appActionType.SAVE, payload: {settings: settings}});
         }).catch(err => {
             console.error(`Unhandled error when setting key with indexedDB: ${err.name}`);
             // toggle warning state (to render warning bar)
             // Keep default state with no data
-            appDispatch({type: 'enableStorageFailureWarning'});
-            appDispatch({type: 'Home', payload: initialAppState.settings});
+            appDispatch({type: appActionType.EnableStorageFailureWarning});
+            appDispatch({type: appActionType.HOME, payload: initialAppState.settings});
             throw err;
         });
     }, []);
+
+    const [location, setLocation] = useHashLocation();
+    useEffect(() => {
+        console.log(`status changed: ${state.status}, current route - ${location}`);
+
+        switch(location) {
+            case appRoutes.SETTINGS:
+                appDispatch({type: appActionType.SWITCH_TO_SETTINGS});
+                break;
+            case appRoutes.HOME:
+                appDispatch({type: appActionType.SWITCH_TO_HOME});
+                break;
+        }
+
+        console.log(`new status: ${state.status} - current route - ${location}`);
+
+    },[state.status]);
 
     // render
     console.debug("app state");
@@ -34,37 +54,29 @@ const App = () => {
         return null;
     }
 
-
     return (
         <>
             <Router hook={useHashLocation}>
-                <nav>
-                    <Link href="/" onClick={() => appDispatch({type: appActionType.SWITCH_TO_HOME})}>
-                        <a id="home-link" rel="noreferrer noopener">Home</a>
-                    </Link>
-                    <Link href="/settings" onClick={() => appDispatch({type: appActionType.SETTINGS})}>
-                        <a id="settings-link" rel="noreferrer noopener">Settings</a>
-                    </Link>
-                </nav>
+                <NavBar routes={navRoutes} appDispatch={appDispatch}/>
 
                 {state.warnStorage && warningStorageContent}
 
                 <Switch>
-                    <Route path="/settings">
+                    <Route path={appRoutes.SETTINGS}>
                         {() => {
                             return (
                                 <>
-                                    <Settings settings={state.settings} dispatch={appDispatch}/>
+                                    <Settings settings={state.settings} dispatch={appDispatch} debug={state}/>
                                 </>)
                         }
                         }
                     </Route>
 
-                    <Route path="/">
+                    <Route path={appRoutes.HOME}>
                         {() => {
                             const settings = state.settings;
                             return (
-                                <Home settings={settings}/>
+                                <Home settings={settings} dispatch={appDispatch} debug={state}/>
                             );
                         }
                         }
@@ -74,58 +86,6 @@ const App = () => {
                 </Switch> </Router>
         </>
     );
-}
-
-function appReducer(state, action: appAction) {
-    switch (action.type) {
-        case appActionType.SAVE:
-            console.debug("request to save new birthDay");
-            let newDay = action.payload.birthDay;
-            console.debug(newDay);
-            console.debug(state);
-            return {...state, settings: {birthDay: newDay}, status: appStatus.SETTINGS};
-        case appActionType.HOME:
-            console.debug("Switch to Home page");
-            return {...state, status: appStatus.HOME, settings: action.payload.settings};
-        case appActionType.SETTINGS:
-            console.debug("Switch to Settings page");
-            return {...state, status: appStatus.SETTINGS};
-        case appActionType.EnableStorageFailureWarning:
-            console.warn("Writing or reading failed");
-            return {...state, warnStorage: true};
-        case appActionType.SWITCH_TO_HOME:
-            return {...state, status: appStatus.HOME};
-
-        default:
-            console.error("unhandled app action");
-            console.error(state);
-            console.error(action);
-    }
-}
-
-export interface appState {
-    settings: { birthDay: Date | null }
-    status: appStatus
-    warnStorage: boolean
-}
-
-export const enum appStatus {
-    LOADING = "Loading",
-    HOME = "Home",
-    SETTINGS = "Settings",
-}
-
-export interface appAction {
-    type: appActionType,
-    payload: any,
-}
-
-export const enum appActionType {
-    HOME,
-    SAVE,
-    EnableStorageFailureWarning,
-    SETTINGS,
-    SWITCH_TO_HOME,
 }
 
 

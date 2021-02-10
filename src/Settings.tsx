@@ -2,7 +2,7 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import {set} from "idb-keyval";
 import {Redirect} from "wouter";
-import {appActionType} from "./App";
+import {appActionType} from "./appActions";
 
 export const Settings = (props) => {
 
@@ -10,14 +10,17 @@ export const Settings = (props) => {
     console.debug("settings props");
     console.debug(props);
     const birthDaySet = props.settings.birthDay;
-    let birthDayGreeting;
-    if (birthDaySet) {
-        birthDayGreeting = <p>Your birthday is {props.settings.birthDay.toLocaleDateString()}</p>
-    } else {
-        birthDayGreeting = <p>Set your birthday below.</p>
-    }
+
+    const settingsGreeting = () => {
+        if (birthDaySet) {
+            return <p>Your next birthday reminder is on {props.settings.birthDay.toLocaleDateString()}</p>
+        } else {
+            return <p>Set your first birthday reminder</p>
+        }
+    };
 
     useEffect(() => {
+        console.log("settings page attached");
         const settingFormElement = document.getElementById('form-settings');
         settingFormElement.addEventListener('submit', handleFormSubmit);
 
@@ -32,9 +35,13 @@ export const Settings = (props) => {
 
         set('date-iso', birthDay).then(res => {
                 console.debug("Set birthDay in idb");
-                props.dispatch({type: appActionType.SAVE, payload: {birthDay}})
+                props.dispatch({type: appActionType.SAVE, payload: {settings: {birthDay: birthDay}}});
                 console.debug("Set birthDay in app");
+                setFilled(true);
+                console.debug("form marked as filled in settings");
                 props.dispatch({type: appActionType.SWITCH_TO_HOME});
+                console.debug("Should be in home status now");
+                console.debug(props);
             }
         ).catch(err => {
             switch (err.name) {
@@ -52,14 +59,15 @@ export const Settings = (props) => {
 
     return (
         <>
-            {filled && <Redirect to="/"/>}
+            {filled && <Redirect to ="/"/>}
             <h1 id="settings-header">Settings</h1>
-            {birthDayGreeting}
+            {settingsGreeting()}
             <form id="form-settings">
-                <label for="set-birthday">Next birthday</label>
+                <label for="set-birthday">Set reminder to</label>
                 <input name="birth-date" id="set-birthday" type="date" required/>
+                {/*<button onClick={() => setFilled(true)} type="submit">Save Settings</button>*/}
 
-                <button onClick={() => setFilled(true)} type="submit">Save Settings</button>
+                <button type="submit">Save Settings</button>
             </form>
         </>)
 }

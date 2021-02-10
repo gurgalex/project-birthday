@@ -7,16 +7,57 @@
     <meta name="description" content="The page to get notified of when it is your birthday.">
     <title>Birthday Notifier</title>
     <style>
-        nav a:link, a:visited {
-            color: blue;
-            border-width: 0 0.1em 0 0;
-            border-color: black;
-            border-style: solid;
-            padding: 0.25em;
+
+        a:focus, a:hover {
+            border: 2px solid #00b0f4;
         }
-        nav a:last-child{
-            border: 0;
+
+        nav [aria-current] {
+            border-bottom: 0.125em solid #fa7176;
         }
+
+        nav {
+            border-bottom: 1px solid black;
+        }
+
+        nav a:link {
+            text-decoration-line: none;
+            padding: 0.3em 0.5em;
+            color: black;
+        }
+
+        nav a:hover, nav a:active, nav a:focus {
+            color: deeppink;
+        }
+
+        .btn {
+            background-color: skyblue;
+            color: black;
+            width: fit-content;
+            padding: 0.5em;
+            vertical-align: middle;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:active, .btn:hover, .btn:focus {
+            background-color: steelblue;
+        }
+
+        #form-settings > input {
+            display: block;
+        }
+
+        #form-settings > button {
+            background-color: skyblue;
+            border: 1px solid black;
+            margin: 6px 0;
+            display: block;
+        }
+        #form-settings > button:hover, #form-settings > button:focus {
+            background-color: steelblue;
+        }
+
     </style>
     <script type='module' src='/index.js'></script>
 </head>
