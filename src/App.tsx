@@ -1,11 +1,12 @@
 import {get} from "idb-keyval";
 import * as React from "react";
 import {useEffect, useReducer} from "react";
-import {Link, Route, Router, Switch} from "wouter";
+import {Link, Route, Router, Switch, useRoute} from "wouter";
 import {useHashLocation} from "./hashRouteHook";
 import {Settings} from "./Settings";
 import {Home} from "./Home";
 import {appActionType, appReducer, appState, appStatus} from "./appActions";
+import {appRoutes} from "./routes";
 
 const App = () => {
     const initialAppState: appState = {settings: {birthDay: null}, status: appStatus.LOADING, warnStorage: false};
@@ -27,10 +28,21 @@ const App = () => {
         });
     }, []);
 
+    const [location, setLocation] = useHashLocation();
     useEffect(() => {
-        console.log("state changed");
-        appDispatch({type: appActionType.SWITCH_TO_HOME});
-        console.log(state);
+        console.log(`status changed: ${state.status}, current route - ${location}`);
+
+        switch(location) {
+            case appRoutes.SETTINGS:
+                appDispatch({type: appActionType.SWITCH_TO_SETTINGS});
+                break;
+            case appRoutes.HOME:
+                appDispatch({type: appActionType.SWITCH_TO_HOME});
+                break;
+        }
+
+        console.log(`new status: ${state.status} - current route - ${location}`);
+
     },[state.status]);
 
     // render
@@ -50,10 +62,10 @@ const App = () => {
             <Router hook={useHashLocation}>
                 <nav>
                     {/*There is certainly a less repetitive way to determine the active page*/}
-                    <Link href="/" onClick={() => appDispatch({type: appActionType.SWITCH_TO_HOME})}>
+                    <Link href={appRoutes.HOME} onClick={() => appDispatch({type: appActionType.SWITCH_TO_HOME})}>
                         <a id="home-link" {...(state.status === appStatus.HOME ? activeLinkProps : {})} rel="noreferrer noopener">Home</a>
                     </Link>
-                    <Link href="/settings" onClick={() => appDispatch({type: appActionType.SETTINGS})}>
+                    <Link href={appRoutes.SETTINGS} onClick={() => appDispatch({type: appActionType.SETTINGS})}>
                         <a id="settings-link" {...(state.status === appStatus.SETTINGS ? activeLinkProps : {})} rel="noreferrer noopener">Settings</a>
                     </Link>
                 </nav>
@@ -61,7 +73,7 @@ const App = () => {
                 {state.warnStorage && warningStorageContent}
 
                 <Switch>
-                    <Route path="/settings">
+                    <Route path={appRoutes.SETTINGS}>
                         {() => {
                             return (
                                 <>
@@ -71,7 +83,7 @@ const App = () => {
                         }
                     </Route>
 
-                    <Route path="/">
+                    <Route path={appRoutes.HOME}>
                         {() => {
                             const settings = state.settings;
                             return (

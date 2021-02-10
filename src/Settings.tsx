@@ -37,7 +37,8 @@ export const Settings = (props) => {
                 console.debug("Set birthDay in idb");
                 props.dispatch({type: appActionType.SAVE, payload: {settings: {birthDay: birthDay}}});
                 console.debug("Set birthDay in app");
-                props.dispatch({type: appActionType.SWITCH_TO_HOME});
+                setFilled(true);
+                console.debug("form marked as filled in settings");
             }
         ).catch(err => {
             switch (err.name) {
@@ -61,8 +62,9 @@ export const Settings = (props) => {
             <form id="form-settings">
                 <label for="set-birthday">Set reminder to</label>
                 <input name="birth-date" id="set-birthday" type="date" required/>
+                {/*<button onClick={() => setFilled(true)} type="submit">Save Settings</button>*/}
 
-                <button onClick={() => setFilled(true)} type="submit">Save Settings</button>
+                <button type="submit">Save Settings</button>
             </form>
         </>)
 }
