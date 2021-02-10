@@ -2,7 +2,7 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import {set} from "idb-keyval";
 import {Redirect} from "wouter";
-import {appActionType} from "./App";
+import {appActionType} from "./appActions";
 
 export const Settings = (props) => {
 
@@ -20,6 +20,7 @@ export const Settings = (props) => {
     };
 
     useEffect(() => {
+        console.log("settings page attached");
         const settingFormElement = document.getElementById('form-settings');
         settingFormElement.addEventListener('submit', handleFormSubmit);
 
@@ -34,7 +35,7 @@ export const Settings = (props) => {
 
         set('date-iso', birthDay).then(res => {
                 console.debug("Set birthDay in idb");
-                props.dispatch({type: appActionType.SAVE, payload: {birthDay}})
+                props.dispatch({type: appActionType.SAVE, payload: {settings: {birthDay: birthDay}}});
                 console.debug("Set birthDay in app");
                 props.dispatch({type: appActionType.SWITCH_TO_HOME});
             }
