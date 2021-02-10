@@ -35,7 +35,7 @@ describe('App', () => {
         await page.waitForSelector("#home-greeting");
     });
 
-    it("The currently viewed page is the shown as active in the navigation list", async () => {
+    it("The currently viewed page is shown as active in the navigation list", async () => {
         await page.goto(site.home);
        await page.waitForSelector("nav [aria-current='page']");
        // make sure it matches the current page
