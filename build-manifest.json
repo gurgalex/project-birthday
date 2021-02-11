@@ -1,0 +1,247 @@
+{
+  "inputs": {
+    "index.html.inline.0.css": {
+      "bytes": 1185,
+      "imports": []
+    },
+    "_snowpack/pkg/common/index-e66f0a38.js": {
+      "bytes": 8994,
+      "imports": []
+    },
+    "_snowpack/pkg/react.js": {
+      "bytes": 1591,
+      "imports": [
+        {
+          "path": "_snowpack/pkg/common/index-e66f0a38.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/common/index-e66f0a38.js",
+          "kind": "import-statement"
+        }
+      ]
+    },
+    "_snowpack/pkg/react-dom.js": {
+      "bytes": 127469,
+      "imports": [
+        {
+          "path": "_snowpack/pkg/common/index-e66f0a38.js",
+          "kind": "import-statement"
+        }
+      ]
+    },
+    "_snowpack/pkg/idb-keyval.js": {
+      "bytes": 1502,
+      "imports": []
+    },
+    "_snowpack/pkg/wouter.js": {
+      "bytes": 9500,
+      "imports": [
+        {
+          "path": "_snowpack/pkg/common/index-e66f0a38.js",
+          "kind": "import-statement"
+        }
+      ]
+    },
+    "hashRouteHook.js": {
+      "bytes": 529,
+      "imports": [
+        {
+          "path": "_snowpack/pkg/react.js",
+          "kind": "import-statement"
+        }
+      ]
+    },
+    "appActions.js": {
+      "bytes": 1820,
+      "imports": []
+    },
+    "Settings.js": {
+      "bytes": 2883,
+      "imports": [
+        {
+          "path": "_snowpack/pkg/react.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/react.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/idb-keyval.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/wouter.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "appActions.js",
+          "kind": "import-statement"
+        }
+      ]
+    },
+    "Home.js": {
+      "bytes": 1741,
+      "imports": [
+        {
+          "path": "_snowpack/pkg/wouter.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/react.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "appActions.js",
+          "kind": "import-statement"
+        }
+      ]
+    },
+    "routes.js": {
+      "bytes": 399,
+      "imports": [
+        {
+          "path": "appActions.js",
+          "kind": "import-statement"
+        }
+      ]
+    },
+    "NavBar.js": {
+      "bytes": 777,
+      "imports": [
+        {
+          "path": "hashRouteHook.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/wouter.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/react.js",
+          "kind": "import-statement"
+        }
+      ]
+    },
+    "App.js": {
+      "bytes": 3595,
+      "imports": [
+        {
+          "path": "_snowpack/pkg/idb-keyval.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/react.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/react.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/wouter.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "hashRouteHook.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "Settings.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "Home.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "appActions.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "routes.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "NavBar.js",
+          "kind": "import-statement"
+        }
+      ]
+    },
+    "index.js": {
+      "bytes": 248,
+      "imports": [
+        {
+          "path": "_snowpack/pkg/react.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/react-dom.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "App.js",
+          "kind": "import-statement"
+        }
+      ]
+    }
+  },
+  "outputs": {
+    "../~~bundle~~/index.html.inline.0.css": {
+      "imports": [],
+      "inputs": {
+        "index.html.inline.0.css": {
+          "bytesInOutput": 800
+        }
+      },
+      "bytes": 830
+    },
+    "../~~bundle~~/index.js": {
+      "imports": [],
+      "exports": [],
+      "inputs": {
+        "_snowpack/pkg/common/index-e66f0a38.js": {
+          "bytesInOutput": 11045
+        },
+        "_snowpack/pkg/react.js": {
+          "bytesInOutput": 1062
+        },
+        "_snowpack/pkg/react-dom.js": {
+          "bytesInOutput": 188801
+        },
+        "_snowpack/pkg/idb-keyval.js": {
+          "bytesInOutput": 1068
+        },
+        "_snowpack/pkg/wouter.js": {
+          "bytesInOutput": 5710
+        },
+        "hashRouteHook.js": {
+          "bytesInOutput": 454
+        },
+        "appActions.js": {
+          "bytesInOutput": 1799
+        },
+        "Settings.js": {
+          "bytesInOutput": 2551
+        },
+        "Home.js": {
+          "bytesInOutput": 1514
+        },
+        "routes.js": {
+          "bytesInOutput": 334
+        },
+        "NavBar.js": {
+          "bytesInOutput": 589
+        },
+        "App.js": {
+          "bytesInOutput": 2977
+        },
+        "index.js": {
+          "bytesInOutput": 125
+        }
+      },
+      "bytes": 218308
+    }
+  }
+}
