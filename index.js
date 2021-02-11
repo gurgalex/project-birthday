@@ -7267,6 +7267,11 @@ var appActionType;
   appActionType2[appActionType2["SWITCH_TO_SETTINGS"] = 5] = "SWITCH_TO_SETTINGS";
 })(appActionType || (appActionType = {}));
 
+// utils.js
+var showUTCDate = (date) => {
+  return date.toUTCString().split(" ").slice(0, 4).join(" ");
+};
+
 // Settings.js
 var Settings = (props) => {
   const [filled, setFilled] = useState(false);
@@ -7275,7 +7280,7 @@ var Settings = (props) => {
   const birthDaySet = props.settings.birthDay;
   const settingsGreeting = () => {
     if (birthDaySet) {
-      return /* @__PURE__ */ createElement("p", null, "Your next birthday reminder is on ", props.settings.birthDay.toLocaleDateString());
+      return /* @__PURE__ */ createElement(Fragment, null, /* @__PURE__ */ createElement("p", null, "Your next birthday reminder is on "), /* @__PURE__ */ createElement("p", null, showUTCDate(props.settings.birthDay)));
     } else {
       return /* @__PURE__ */ createElement("p", null, "Set your first birthday reminder");
     }
@@ -7322,7 +7327,7 @@ var Settings = (props) => {
     id: "form-settings"
   }, /* @__PURE__ */ createElement("label", {
     for: "set-birthday"
-  }, "Set reminder to"), /* @__PURE__ */ createElement("input", {
+  }, /* @__PURE__ */ createElement("b", null, "Set reminder to")), /* @__PURE__ */ createElement("input", {
     name: "birth-date",
     id: "set-birthday",
     type: "date",
@@ -7343,7 +7348,7 @@ var Home = (props) => {
     }, "Welcome to the birthday reminder app!"), /* @__PURE__ */ createElement("p", {
       id: "when-next-birthday",
       "data-date": props.settings?.birthDay.toISOString()
-    }, "Your birthday is: ", props.settings.birthDay.toLocaleDateString()), /* @__PURE__ */ createElement(Link, {
+    }, "Your birthday is: ", showUTCDate(props.settings.birthDay)), /* @__PURE__ */ createElement(Link, {
       href: "/settings",
       onClick: () => {
         console.log("dispatch change to settings");

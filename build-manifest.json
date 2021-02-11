@@ -56,8 +56,12 @@
       "bytes": 1820,
       "imports": []
     },
+    "utils.js": {
+      "bytes": 104,
+      "imports": []
+    },
     "Settings.js": {
-      "bytes": 2883,
+      "bytes": 3070,
       "imports": [
         {
           "path": "_snowpack/pkg/react.js",
@@ -78,11 +82,15 @@
         {
           "path": "appActions.js",
           "kind": "import-statement"
+        },
+        {
+          "path": "utils.js",
+          "kind": "import-statement"
         }
       ]
     },
     "Home.js": {
-      "bytes": 1741,
+      "bytes": 1773,
       "imports": [
         {
           "path": "_snowpack/pkg/wouter.js",
@@ -94,6 +102,10 @@
         },
         {
           "path": "appActions.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "utils.js",
           "kind": "import-statement"
         }
       ]
@@ -222,11 +234,14 @@
         "appActions.js": {
           "bytesInOutput": 1799
         },
+        "utils.js": {
+          "bytesInOutput": 95
+        },
         "Settings.js": {
-          "bytesInOutput": 2551
+          "bytesInOutput": 2674
         },
         "Home.js": {
-          "bytesInOutput": 1514
+          "bytesInOutput": 1506
         },
         "routes.js": {
           "bytesInOutput": 334
@@ -241,7 +256,7 @@
           "bytesInOutput": 125
         }
       },
-      "bytes": 218308
+      "bytes": 218531
     }
   }
 }
