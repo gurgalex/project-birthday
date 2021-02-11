@@ -1,8 +1,8 @@
 import puppeteer from "puppeteer";
 import { expect } from 'chai';
-import HomePage from "./testPOM/Home";
-import NavHeader from "./testPOM/Nav";
-import {SettingsPage} from "./testPOM/Settings";
+import HomePage from "./POM/Home";
+import NavHeader from "./POM/Nav";
+import {SettingsPage} from "./POM/Settings";
 
 // puppeteer options
 const opts = {

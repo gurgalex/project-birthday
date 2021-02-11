@@ -4,7 +4,7 @@
   "description": "Notify user when it is their birthday",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --require esm --require ts-node/register --extensions ts,tsx 'src/**/*.test.{js,ts}'"
+    "test": "mocha --require esm --require ts-node/register --extensions ts,tsx 'tests/**/*.test.{js,ts}'"
   },
   "keywords": [
     "birthday",
