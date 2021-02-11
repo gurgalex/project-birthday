@@ -1,11 +1,16 @@
 import {Page} from "puppeteer";
 import NavPage from "./Nav";
-import {expect} from "chai";
 import HomePage from "./Home";
 
 export class SettingsPage {
-    private page: Page;
-    private navHeader: NavPage;
+    static headerID = "settings-header";
+    static birthdayInputID = "set-birthday";
+    static selector = {
+        birthdayInput: `#${SettingsPage.birthdayInputID}`,
+        header: `#${SettingsPage.headerID}`,
+    };
+    public page: Page;
+    public navHeader: NavPage;
 
     constructor(page: Page) {
         this.page = page;
@@ -13,25 +18,29 @@ export class SettingsPage {
     }
 
     async go() {
-        await this.page.waitForSelector('#settings-header');
+        await this.page.waitForSelector(SettingsPage.selector.header);
+    }
+
+    async settingsFormBirthdayElement() {
+        await this.page.waitForSelector(SettingsPage.selector.birthdayInput);
+        return await this.page.$(SettingsPage.selector.birthdayInput);
+
     }
 
     async fillInBirthDay(date: Date) {
-        await this.page.waitForSelector('#set-birthday');
-        let setBirthdayInput = await this.page.$("#set-birthday");
+        let setBirthdayInput = await this.settingsFormBirthdayElement();
         if (setBirthdayInput == null) {
-            throw Error("The form with id '#set-birthday' is missing");
+            throw Error(`The form field with id ${SettingsPage.birthdayInputID} is missing`);
         }
         let dateOnly = date.toISOString().split("T")[0];
-        let [year, month, day] = dateOnly.split("-");
         // @ts-ignore
-        await page.$eval('#set-birthday', (el, value) => el.value = value, dateOnly);
+        await page.$eval(SettingsPage.selector.birthdayInput, (el, value) => el.value = value, dateOnly);
     }
 
     async submitBirthDay(): Promise<HomePage> {
-        let setBirthdayInput = await this.page.$("#set-birthday");
+        let setBirthdayInput = await this.settingsFormBirthdayElement();
         if (setBirthdayInput == null) {
-            throw Error("The form with id '#set-birthday' is missing");
+            throw Error(`The form field with id ${SettingsPage.birthdayInputID} is missing`);
         }
         await setBirthdayInput.focus();
         await this.page.keyboard.press("Enter");

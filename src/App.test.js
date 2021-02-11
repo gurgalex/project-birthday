@@ -18,7 +18,8 @@ const site = {
     settings: `${base}/#/settings`,
 };
 
-describe('App', () => {
+describe('App', function() {
+    this.timeout(5000);
 
     before(async () => {
         // @ts-ignore
@@ -68,28 +69,33 @@ describe('App', () => {
         const home = new HomePage(page);
         const setupSettingsBtn = await home.changeSettingsBtnElement();
         await setupSettingsBtn.click();
-        await page.waitForSelector('#settings-header');
+        await page.waitForSelector(SettingsPage.selector.header);
         expect(await page.url()).to.equal(site.settings);
-        let element = await page.$('#settings-header');
+        let element = await page.$(SettingsPage.selector.header);
         await expect(element).to.not.eq({});
     });
 
     it("Clicking on the home link from settings takes you back to the homepage", async () => {
-        await page.goto(site.settings);
-        await page.waitForSelector('#settings-header');
+        let settings = new SettingsPage(page);
+        await settings.go();
         expect(await page.url()).to.eq(site.settings);
-        await page.click("#home-link");
+        await settings.navHeader.clickHome();
         await page.waitForSelector("#home-greeting");
     });
 
     it("Clicking on the settings link from the homepage takes you to the settings page", async () => {
-        await page.goto(site.home);
-        await page.waitForSelector('#home-greeting');
-        await page.click("#settings-link");
-        await page.waitForSelector('#settings-header');
+        let home = new HomePage(page);
+        await home.go();
+        await home.navHeader.clickSettings();
+        await page.waitForSelector(SettingsPage.selector.header);
         expect(await page.url()).to.eq(site.settings);
     });
 
+    it("When visiting the settings page, the first form input is focused", async () => {
+       const instanceSettingsPage = new SettingsPage(page);
+       const activeElementID = await instanceSettingsPage.page.evaluate(() => document.activeElement.id);
+       expect(activeElementID).to.eq(SettingsPage.birthdayInputID);
+    });
 
     it('Saving your birthday reminder navigates to the homepage with the new birthday', async () => {
         const changeSettingsPage = new SettingsPage(page);

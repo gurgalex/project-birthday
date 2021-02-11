@@ -7,7 +7,6 @@ import * as React from "react";
 
 
 export const NavBar = ({routes, appDispatch}) => {
-    const [activeElem, setActiveElem] = useState("");
     const [location, setLocation] = useHashLocation();
 
     const activeLinkProps = {
@@ -31,11 +30,4 @@ export const NavBar = ({routes, appDispatch}) => {
             </nav>
         </>
     )
-}
-
-{/**
- <Link href={route.path} onClick={() => appDispatch({type: routes.UIStateChange})}>
- <a id={route.name} {...(route.path === location ? activeLinkProps : {})} rel="noreferrer noopener">{route.name}</a>
- </Link>
- */
 }

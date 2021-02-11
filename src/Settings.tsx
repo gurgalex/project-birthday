@@ -24,6 +24,9 @@ export const Settings = (props) => {
         const settingFormElement = document.getElementById('form-settings');
         settingFormElement.addEventListener('submit', handleFormSubmit);
 
+        // focus the 1st input of the form
+        document.getElementById('set-birthday').focus();
+
         return () => settingFormElement.removeEventListener('submit', handleFormSubmit);
     }, []);
 
