@@ -16,7 +16,9 @@
     "idb-keyval": "^5.0.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "wouter": "^2.7.3"
+    "wouter": "^2.7.3",
+    "snowpack": "^3.0.11",
+    "typescript": "^4.1.4"
   },
   "devDependencies": {
     "@types/chai": "^4.2.14",
@@ -28,7 +30,6 @@
     "mocha": "^8.2.1",
     "puppeteer": "^7.0.4",
     "regenerator-runtime": "^0.13.7",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.1.4"
+    "ts-node": "^9.1.1"
   }
 }
