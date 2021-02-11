@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import {set} from "idb-keyval";
 import {Redirect} from "wouter";
 import {appActionType} from "./appActions";
+import {showUTCDate} from "./utils.ts";
 
 export const Settings = (props) => {
 
@@ -13,7 +14,7 @@ export const Settings = (props) => {
 
     const settingsGreeting = () => {
         if (birthDaySet) {
-            return <p>Your next birthday reminder is on {props.settings.birthDay.toLocaleDateString()}</p>
+            return <><p>Your next birthday reminder is on </p><p>{showUTCDate(props.settings.birthDay)}</p></>
         } else {
             return <p>Set your first birthday reminder</p>
         }
@@ -66,9 +67,8 @@ export const Settings = (props) => {
             <h1 id="settings-header">Settings</h1>
             {settingsGreeting()}
             <form id="form-settings">
-                <label for="set-birthday">Set reminder to</label>
+                <label for="set-birthday"><b>Set reminder to</b></label>
                 <input name="birth-date" id="set-birthday" type="date" required/>
-                {/*<button onClick={() => setFilled(true)} type="submit">Save Settings</button>*/}
 
                 <button type="submit">Save Settings</button>
             </form>

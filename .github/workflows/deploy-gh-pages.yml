@@ -22,8 +22,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-
 
-    - run: "npm i"
-    - run: "npm i snowpack typescript"
+    - run: "npm i --only=prod"
     - run: "npx snowpack build"
 
     - name: Deploy

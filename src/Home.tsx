@@ -2,6 +2,7 @@ import {Link} from "wouter";
 import * as React from "react";
 import {appProps} from "./App";
 import {appActionType} from "./appActions";
+import {showUTCDate} from "./utils.ts";
 
 export const Home = (props: Partial<appProps>) => {
     console.log("homepage attached");
@@ -11,7 +12,7 @@ export const Home = (props: Partial<appProps>) => {
         return (
             <>
                 <p id="home-greeting">Welcome to the birthday reminder app!</p>
-                <p id="when-next-birthday" data-date={props.settings?.birthDay.toISOString()}>Your birthday is: {props.settings.birthDay.toLocaleDateString()}</p>
+                <p id="when-next-birthday" data-date={props.settings?.birthDay.toISOString()}>Your birthday is: {showUTCDate(props.settings.birthDay)}</p>
 
                 <Link href="/settings"
                       onClick={() => {
