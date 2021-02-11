@@ -23,6 +23,7 @@
     "@types/mocha": "^8.2.0",
     "@types/puppeteer": "^5.4.3",
     "chai": "^4.3.0",
+    "dotenv": "^8.2.0",
     "esm": "^3.2.25",
     "mocha": "^8.2.1",
     "puppeteer": "^7.0.4",
