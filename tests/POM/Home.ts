@@ -1,7 +1,6 @@
 import {Page} from "puppeteer";
 import NavPage from "./Nav";
 
-const baseURL = 'https://localhost:8080';
 export default class HomePage {
     static route = "/"
     static query = {
@@ -16,7 +15,7 @@ export default class HomePage {
     }
 
     async go() {
-        await this.page.goto(baseURL + HomePage.route);
+        await this.page.goto(process.env.SITE_URL + HomePage.route);
         await this.page.waitForSelector("#home-greeting");
         return this;
     }

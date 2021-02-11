@@ -1,8 +1,10 @@
 import puppeteer from "puppeteer";
 import { expect } from 'chai';
-import HomePage from "./testPOM/Home";
-import NavHeader from "./testPOM/Nav";
-import {SettingsPage} from "./testPOM/Settings";
+import HomePage from "./POM/Home";
+import NavHeader from "./POM/Nav";
+import {SettingsPage} from "./POM/Settings";
+import dotenv from  'dotenv';
+dotenv.config();
 
 // puppeteer options
 const opts = {
@@ -12,7 +14,7 @@ const opts = {
 };
 
 // testing local options
-const base = "https://localhost:8080";
+const base = process.env.SITE_URL;
 const site = {
     home: `${base}/#/`,
     settings: `${base}/#/settings`,

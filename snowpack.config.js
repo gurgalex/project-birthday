@@ -3,13 +3,17 @@
 
 /** @type {import("snowpack").SnowpackUserConfig } */
 module.exports = {
+	optimize: {
+		bundle: true,
+		treeshake: true,
+	},
   mount: {
 	  src: "/",
   },
   plugins: [
   ],
   packageOptions: {
-	  "source": "remote",
+	  //"source": "remote",
 	  "types": true,
   },
   devOptions: {
@@ -18,6 +22,6 @@ module.exports = {
 	  open: "none",
   },
   buildOptions: {
-	  baseUrl: "/",
+	  baseUrl: "/birthday/",
   },
 };
