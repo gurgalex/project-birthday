@@ -43,15 +43,12 @@ export const Settings = (props) => {
                 console.debug("Set birthDay in app");
                 setFilled(true);
                 console.debug("form marked as filled in settings");
-                props.dispatch({type: appActionType.SWITCH_TO_HOME});
-                console.debug("Should be in home status now");
-                console.debug(props);
             }
         ).catch(err => {
             switch (err.name) {
                 case 'QuotaExceededError':
                     console.warn(`${err.name}: Failed to persist birthday in idb`);
-                    props.dispatch({type: appActionType.EnableStorageFailureWarning});
+                    props.dispatch({type: appActionType.ENABLE_STORAGE_FAILURE_WARNING});
                     break;
                 default:
                     console.error(`Unhandled error when setting key with indexedDB: ${err.name}`);
@@ -61,9 +58,12 @@ export const Settings = (props) => {
         });
     };
 
+    if (filled) {
+        return <Redirect to ="/"/>
+    }
+
     return (
         <>
-            {filled && <Redirect to ="/"/>}
             <h1 id="settings-header">Settings</h1>
             {settingsGreeting()}
             <form id="form-settings">

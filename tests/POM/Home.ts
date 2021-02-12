@@ -4,7 +4,7 @@ import NavPage from "./Nav";
 export default class HomePage {
     static route = "/"
     static query = {
-        firstTimeSetupGreeting: "#no-settings-greeting",
+        firstTimeSetupGreeting: "#first-time-setup",
         settingsSetupBtn: "#settings-setup-btn",
     }
     private readonly page: Page;

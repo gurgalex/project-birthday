@@ -10,11 +10,12 @@ import {appRoutes, navRoutes} from "./routes";
 import {NavBar} from './NavBar';
 
 const App = () => {
-    const initialAppState: appState = {settings: {birthDay: null}, status: appStatus.LOADING, warnStorage: false};
+    const initialAppState: appState = {settings: {birthDay: null}, isLoaded: false, warnStorage: false};
     const [state, appDispatch] = useReducer(appReducer, initialAppState);
 
     // load data
     useEffect(() => {
+        // Todo: Fetch all app state from IDB
         getDateFromStorage().then(settings => {
             console.debug("got birthDay setting from idb");
             console.debug(settings);
@@ -23,33 +24,17 @@ const App = () => {
             console.error(`Unhandled error when setting key with indexedDB: ${err.name}`);
             // toggle warning state (to render warning bar)
             // Keep default state with no data
-            appDispatch({type: appActionType.EnableStorageFailureWarning});
-            appDispatch({type: appActionType.HOME, payload: initialAppState.settings});
+            appDispatch({type: appActionType.ENABLE_STORAGE_FAILURE_WARNING});
+            appDispatch({type: appActionType.SAVE, payload: initialAppState.settings});
             throw err;
-        });
+        }).then(() => {
+            appDispatch({type: appActionType.DONE_LOADING})
+        })
     }, []);
 
-    const [location, setLocation] = useHashLocation();
-    useEffect(() => {
-        console.log(`status changed: ${state.status}, current route - ${location}`);
-
-        switch(location) {
-            case appRoutes.SETTINGS:
-                appDispatch({type: appActionType.SWITCH_TO_SETTINGS});
-                break;
-            case appRoutes.HOME:
-                appDispatch({type: appActionType.SWITCH_TO_HOME});
-                break;
-        }
-
-        console.log(`new status: ${state.status} - current route - ${location}`);
-
-    },[state.status]);
-
     // render
-    console.debug("app state");
-    console.debug(state);
-    if (state.status === appStatus.LOADING) {
+    console.debug("app state\n", state);
+    if (state.isLoaded === false) {
         console.debug("app in loading state");
         return null;
     }
@@ -106,6 +91,7 @@ const warningStyle = {
 
 export interface appProps {
     settings: { birthDay: Date },
+    hasBeenNotified: boolean,
 }
 
 const warningStorageContent = <>
