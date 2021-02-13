@@ -10,22 +10,27 @@ import {appRoutes, navRoutes} from "./routes";
 import {NavBar} from './NavBar';
 
 const App = () => {
-    const initialAppState: appState = {settings: {birthDay: null}, isLoaded: false, warnStorage: false};
+    const initialAppState: appState = {
+        settings: {birthDay: null},
+        hasBeenNotified: false,
+        isLoaded: false,
+        warnStorage: false,
+    };
     const [state, appDispatch] = useReducer(appReducer, initialAppState);
 
     // load data
     useEffect(() => {
         // Todo: Fetch all app state from IDB
-        getDateFromStorage().then(settings => {
-            console.debug("got birthDay setting from idb");
-            console.debug(settings);
-            appDispatch({type: appActionType.SAVE, payload: {settings: settings}});
+        getAllStateFromStorage().then(data => {
+            console.debug("got reminder app state from idb", data);
+            appDispatch({type: appActionType.SAVE, payload: data});
+
         }).catch(err => {
             console.error(`Unhandled error when setting key with indexedDB: ${err.name}`);
             // toggle warning state (to render warning bar)
             // Keep default state with no data
             appDispatch({type: appActionType.ENABLE_STORAGE_FAILURE_WARNING});
-            appDispatch({type: appActionType.SAVE, payload: initialAppState.settings});
+            appDispatch({type: appActionType.SAVE, payload: initialAppState});
             throw err;
         }).then(() => {
             appDispatch({type: appActionType.DONE_LOADING})
@@ -59,9 +64,8 @@ const App = () => {
 
                     <Route path={appRoutes.HOME}>
                         {() => {
-                            const settings = state.settings;
                             return (
-                                <Home settings={settings} dispatch={appDispatch} debug={state}/>
+                                <Home settings={state.settings} hasBeenNotified={state.hasBeenNotified} dispatch={appDispatch} debug={state}/>
                             );
                         }
                         }
@@ -74,14 +78,20 @@ const App = () => {
 }
 
 
-function getDateFromStorage(): Promise<Date | undefined> {
-    return get('date-iso').then((day: Date) => {
-        console.debug(`Got day from idb init: ${day}`);
-        return {birthDay: day};
-    }).catch(err => {
-        console.warning("Failed to get date from local storage");
-    });
+async function getAllStateFromStorage(): Promise<Partial<appState> | undefined> {
+    let data: Partial<appState> = {
+        settings: {birthDay: null},
+    };
 
+    try {
+        data.settings.birthDay = await get('date-iso');
+        data.hasBeenNotified = await get("notify");
+        return data
+    }
+    catch (err) {
+        console.error("Failed to get date from offline storage", JSON.stringify(err));
+        throw err;
+    }
 }
 
 const warningStyle = {

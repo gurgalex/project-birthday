@@ -2,16 +2,14 @@ export function appReducer(state: appState, action: appAction) {
     console.debug("perform action - state\n", action, "\n", state);
     switch (action.type) {
         case appActionType.SAVE:
-            console.debug("request to save new birthDay - Payload:");
-            console.debug(action.payload);
-            let newDay = action.payload.settings.birthDay;
-            console.debug(newDay);
-            return {...state, settings: {birthDay: newDay}};
+            let newState = {...state, ...action.payload};
+            console.debug("new SAVE state: ", newState);
+            return newState;
         case appActionType.ENABLE_STORAGE_FAILURE_WARNING:
             console.warn("Writing or reading failed");
             return {...state, warnStorage: true};
         case appActionType.SHOULD_NOTIFY_USER:
-            return {...state, hasBeenNotified: action.payload.notify}
+            return {...state, hasBeenNotified: action.payload.notified}
         case appActionType.DONE_LOADING:
             return {...state, isLoaded: true};
         default:

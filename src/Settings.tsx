@@ -40,6 +40,7 @@ export const Settings = (props) => {
         set('date-iso', birthDay).then(res => {
                 console.debug("Set birthDay in idb");
                 props.dispatch({type: appActionType.SAVE, payload: {settings: {birthDay: birthDay}}});
+                props.dispatch({type: appActionType.SHOULD_NOTIFY_USER, payload: {notified: false}});
                 console.debug("Set birthDay in app");
                 setFilled(true);
                 console.debug("form marked as filled in settings");
