@@ -1,44 +1,32 @@
-export function appReducer(state, action: appAction) {
+export function appReducer(state: appState, action: appAction) {
+    console.debug("perform action - state\n", action, "\n", state);
     switch (action.type) {
         case appActionType.SAVE:
-            console.debug("request to save new birthDay - Payload:");
-            console.log(action.payload);
-            let newDay = action.payload.settings.birthDay;
-            console.debug(newDay);
-            console.debug(state);
-            return {...state, settings: {birthDay: newDay}};
-        case appActionType.HOME:
-            console.debug("Switch to Home page");
-            return {...state, status: appStatus.HOME, settings: action.payload.settings};
-        case appActionType.SETTINGS:
-            console.debug("Switch to Settings page");
-            return {...state, status: appStatus.SETTINGS};
-        case appActionType.EnableStorageFailureWarning:
+            let newState = {...state, ...action.payload};
+            console.debug("new SAVE state: ", newState);
+            return newState;
+        case appActionType.ENABLE_STORAGE_FAILURE_WARNING:
             console.warn("Writing or reading failed");
             return {...state, warnStorage: true};
-        case appActionType.SWITCH_TO_HOME:
-            return {...state, status: appStatus.HOME};
-        case appActionType.SWITCH_TO_SETTINGS:
-            return {...state, status: appStatus.SETTINGS};
-
+        case appActionType.SHOULD_NOTIFY_USER:
+            return {...state, hasBeenNotified: action.payload.notified}
+        case appActionType.DONE_LOADING:
+            return {...state, isLoaded: true};
         default:
             console.error("unhandled app action");
             console.error(state);
             console.error(action);
+            return state;
     }
 }
 
 export interface appState {
     settings: { birthDay: Date | null }
-    status: appStatus
     warnStorage: boolean
+    hasBeenNotified: boolean
+    isLoaded: boolean
 }
 
-export const enum appStatus {
-    LOADING = "Loading",
-    HOME = "Home",
-    SETTINGS = "Settings",
-}
 
 export interface appAction {
     type: appActionType,
@@ -46,10 +34,8 @@ export interface appAction {
 }
 
 export const enum appActionType {
-    HOME,
-    SAVE,
-    EnableStorageFailureWarning,
-    SETTINGS,
-    SWITCH_TO_HOME,
-    SWITCH_TO_SETTINGS,
+    SAVE = "SAVE",
+    ENABLE_STORAGE_FAILURE_WARNING = "ENABLE_STORAGE_FAILURE_WARNING",
+    SHOULD_NOTIFY_USER = "SHOULD_NOTIFY_USER",
+    DONE_LOADING = "DONE_LOADING",
 }

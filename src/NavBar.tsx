@@ -6,7 +6,7 @@ import {appActionType, appStatus} from "./appActions";
 import * as React from "react";
 
 
-export const NavBar = ({routes, appDispatch}) => {
+export const NavBar = ({routes}) => {
     const [location, setLocation] = useHashLocation();
 
     const activeLinkProps = {
@@ -16,7 +16,7 @@ export const NavBar = ({routes, appDispatch}) => {
     function renderedRoutes() {
         return (
             routes.map(route =>
-                <Link href={route.path}>
+                <Link href={route.path} key={route.id}>
                     <a id={route.id} {...(route.path === location ? activeLinkProps : {})}
                        rel="noreferrer noopener">{route.displayName}</a>
                 </Link>

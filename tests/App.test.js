@@ -47,6 +47,13 @@ describe('App', function() {
         let currentPageNavID = await home.navHeader.activeNavID();
         expect(currentPageNavID).to.eq(NavHeader.homeNavID);
 });
+
+    it("A consent to notifications button is shown if the user has not been asked before", async () => {
+        const home = new HomePage(page);
+        expect(await home.notificationConsentBtnElement()).to.not.be.null;
+
+    });
+
     it("Changing to and from settings using nav links keeps correct active link", async () => {
         const home = new HomePage(page);
         const nav = home.navHeader;
