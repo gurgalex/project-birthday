@@ -53,7 +53,7 @@
       ]
     },
     "appActions.js": {
-      "bytes": 1820,
+      "bytes": 1100,
       "imports": []
     },
     "utils.js": {
@@ -61,7 +61,7 @@
       "imports": []
     },
     "Settings.js": {
-      "bytes": 3070,
+      "bytes": 3049,
       "imports": [
         {
           "path": "_snowpack/pkg/react.js",
@@ -90,7 +90,7 @@
       ]
     },
     "Home.js": {
-      "bytes": 1773,
+      "bytes": 4875,
       "imports": [
         {
           "path": "_snowpack/pkg/wouter.js",
@@ -107,6 +107,14 @@
         {
           "path": "utils.js",
           "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/react.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/idb-keyval.js",
+          "kind": "import-statement"
         }
       ]
     },
@@ -120,7 +128,7 @@
       ]
     },
     "NavBar.js": {
-      "bytes": 777,
+      "bytes": 785,
       "imports": [
         {
           "path": "hashRouteHook.js",
@@ -137,7 +145,7 @@
       ]
     },
     "App.js": {
-      "bytes": 3595,
+      "bytes": 3259,
       "imports": [
         {
           "path": "_snowpack/pkg/idb-keyval.js",
@@ -232,31 +240,31 @@
           "bytesInOutput": 454
         },
         "appActions.js": {
-          "bytesInOutput": 1799
+          "bytesInOutput": 1086
         },
         "utils.js": {
           "bytesInOutput": 95
         },
         "Settings.js": {
-          "bytesInOutput": 2674
+          "bytesInOutput": 2653
         },
         "Home.js": {
-          "bytesInOutput": 1506
+          "bytesInOutput": 4425
         },
         "routes.js": {
           "bytesInOutput": 334
         },
         "NavBar.js": {
-          "bytesInOutput": 589
+          "bytesInOutput": 597
         },
         "App.js": {
-          "bytesInOutput": 2977
+          "bytesInOutput": 2648
         },
         "index.js": {
           "bytesInOutput": 125
         }
       },
-      "bytes": 218531
+      "bytes": 220395
     }
   }
 }

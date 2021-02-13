@@ -7224,47 +7224,32 @@ var useHashLocation = () => {
 
 // appActions.js
 function appReducer(state, action) {
+  console.debug("perform action - state\n", action, "\n", state);
   switch (action.type) {
     case appActionType.SAVE:
-      console.debug("request to save new birthDay - Payload:");
-      console.log(action.payload);
-      let newDay = action.payload.settings.birthDay;
-      console.debug(newDay);
-      console.debug(state);
-      return {...state, settings: {birthDay: newDay}};
-    case appActionType.HOME:
-      console.debug("Switch to Home page");
-      return {...state, status: appStatus.HOME, settings: action.payload.settings};
-    case appActionType.SETTINGS:
-      console.debug("Switch to Settings page");
-      return {...state, status: appStatus.SETTINGS};
-    case appActionType.EnableStorageFailureWarning:
+      let newState = {...state, ...action.payload};
+      console.debug("new SAVE state: ", newState);
+      return newState;
+    case appActionType.ENABLE_STORAGE_FAILURE_WARNING:
       console.warn("Writing or reading failed");
       return {...state, warnStorage: true};
-    case appActionType.SWITCH_TO_HOME:
-      return {...state, status: appStatus.HOME};
-    case appActionType.SWITCH_TO_SETTINGS:
-      return {...state, status: appStatus.SETTINGS};
+    case appActionType.SHOULD_NOTIFY_USER:
+      return {...state, hasBeenNotified: action.payload.notified};
+    case appActionType.DONE_LOADING:
+      return {...state, isLoaded: true};
     default:
       console.error("unhandled app action");
       console.error(state);
       console.error(action);
+      return state;
   }
 }
-var appStatus;
-(function(appStatus2) {
-  appStatus2["LOADING"] = "Loading";
-  appStatus2["HOME"] = "Home";
-  appStatus2["SETTINGS"] = "Settings";
-})(appStatus || (appStatus = {}));
 var appActionType;
 (function(appActionType2) {
-  appActionType2[appActionType2["HOME"] = 0] = "HOME";
-  appActionType2[appActionType2["SAVE"] = 1] = "SAVE";
-  appActionType2[appActionType2["EnableStorageFailureWarning"] = 2] = "EnableStorageFailureWarning";
-  appActionType2[appActionType2["SETTINGS"] = 3] = "SETTINGS";
-  appActionType2[appActionType2["SWITCH_TO_HOME"] = 4] = "SWITCH_TO_HOME";
-  appActionType2[appActionType2["SWITCH_TO_SETTINGS"] = 5] = "SWITCH_TO_SETTINGS";
+  appActionType2["SAVE"] = "SAVE";
+  appActionType2["ENABLE_STORAGE_FAILURE_WARNING"] = "ENABLE_STORAGE_FAILURE_WARNING";
+  appActionType2["SHOULD_NOTIFY_USER"] = "SHOULD_NOTIFY_USER";
+  appActionType2["DONE_LOADING"] = "DONE_LOADING";
 })(appActionType || (appActionType = {}));
 
 // utils.js
@@ -7300,17 +7285,15 @@ var Settings = (props) => {
     set("date-iso", birthDay).then((res) => {
       console.debug("Set birthDay in idb");
       props.dispatch({type: appActionType.SAVE, payload: {settings: {birthDay}}});
+      props.dispatch({type: appActionType.SHOULD_NOTIFY_USER, payload: {notified: false}});
       console.debug("Set birthDay in app");
       setFilled(true);
       console.debug("form marked as filled in settings");
-      props.dispatch({type: appActionType.SWITCH_TO_HOME});
-      console.debug("Should be in home status now");
-      console.debug(props);
     }).catch((err) => {
       switch (err.name) {
         case "QuotaExceededError":
           console.warn(`${err.name}: Failed to persist birthday in idb`);
-          props.dispatch({type: appActionType.EnableStorageFailureWarning});
+          props.dispatch({type: appActionType.ENABLE_STORAGE_FAILURE_WARNING});
           break;
         default:
           console.error(`Unhandled error when setting key with indexedDB: ${err.name}`);
@@ -7319,9 +7302,12 @@ var Settings = (props) => {
       }
     });
   };
-  return /* @__PURE__ */ createElement(Fragment, null, filled && /* @__PURE__ */ createElement(Redirect, {
-    to: "/"
-  }), /* @__PURE__ */ createElement("h1", {
+  if (filled) {
+    return /* @__PURE__ */ createElement(Redirect, {
+      to: "/"
+    });
+  }
+  return /* @__PURE__ */ createElement(Fragment, null, /* @__PURE__ */ createElement("h1", {
     id: "settings-header"
   }, "Settings"), settingsGreeting(), /* @__PURE__ */ createElement("form", {
     id: "form-settings"
@@ -7339,41 +7325,113 @@ var Settings = (props) => {
 
 // Home.js
 var Home = (props) => {
-  console.log("homepage attached");
-  console.debug("main page initial props");
-  console.debug(props);
-  if (props.settings.birthDay) {
+  console.debug("homepage attached");
+  console.debug("main page initial props:", props);
+  function saveNotify() {
+    set("notify", true).then((res) => {
+      props.dispatch({type: appActionType.SHOULD_NOTIFY_USER, payload: {notified: true}});
+      console.debug("Saved that we notified the user already. Persisted to idb");
+    }).catch((err) => {
+      switch (err.name) {
+        case "QuotaExceededError":
+          console.warn(`${err.name}: Failed to persist that we notified the user in idb`);
+          props.dispatch({type: appActionType.ENABLE_STORAGE_FAILURE_WARNING});
+          break;
+        default:
+          console.error(`Unhandled error when setting key with indexedDB: ${err.name}`);
+          console.error(JSON.stringify(err));
+          throw err;
+      }
+    });
+  }
+  useEffect(() => {
+    const birthDayCheckInternval = setInterval(() => {
+      const today = new Date();
+      if (props.hasBeenNotified) {
+        return;
+      }
+      if (today >= props.settings?.birthDay) {
+        new Notification("Birthday Reminder", {body: `Your birthday is soon`});
+        saveNotify();
+        return;
+      }
+    }, 1e3);
+    return () => clearInterval(birthDayCheckInternval);
+  }, [props.settings.birthDay, props.hasBeenNotified]);
+  console.log("Render main page", props);
+  return /* @__PURE__ */ createElement(Fragment, null, /* @__PURE__ */ createElement("p", {
+    id: "home-greeting"
+  }, "Welcome to the birthday reminder app!"), /* @__PURE__ */ createElement(NotificationConsent, null), /* @__PURE__ */ createElement(RenderReminder, {
+    settings: props.settings,
+    hasBeenNotified: props.hasBeenNotified
+  }), /* @__PURE__ */ createElement(Link, {
+    href: "/settings"
+  }, /* @__PURE__ */ createElement("a", {
+    className: "btn",
+    id: "settings-setup-btn"
+  }, `${props.settings?.birthDay ? "Change Reminder" : "Setup Reminder"}`)));
+};
+var NotificationConsent = () => {
+  const [showNotificationConsent, setShowNotificationConsent] = useState(Notification.permission !== "granted");
+  function askNotificationPermission() {
+    console.debug("ask notif perm");
+    function handlePermission(permission) {
+      if (!("permission" in Notification)) {
+        Notification.permission = permission;
+      }
+      console.log(permission);
+      if (Notification.permission === "denied" || Notification.permission === "default") {
+        setShowNotificationConsent(true);
+      } else {
+        setShowNotificationConsent(false);
+      }
+    }
+    if (false in window) {
+      console.log("This browser does not support notifications.");
+    } else {
+      if (checkNotificationPromiseSupport()) {
+        Notification.requestPermission().then((permission) => {
+          handlePermission(permission);
+        });
+      } else {
+        Notification.requestPermission(function(permission) {
+          handlePermission(permission);
+        });
+      }
+    }
+  }
+  function checkNotificationPromiseSupport() {
+    try {
+      Notification.requestPermission().then();
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+  if (!showNotificationConsent) {
+    return null;
+  }
+  return /* @__PURE__ */ createElement(Fragment, null, /* @__PURE__ */ createElement("button", {
+    id: "notification-consent",
+    onClick: askNotificationPermission
+  }, "Consent to reminder notifications"));
+};
+var RenderReminder = (props) => {
+  if (!props.settings.birthDay) {
     return /* @__PURE__ */ createElement(Fragment, null, /* @__PURE__ */ createElement("p", {
-      id: "home-greeting"
-    }, "Welcome to the birthday reminder app!"), /* @__PURE__ */ createElement("p", {
+      id: "first-time-setup"
+    }, "Let's setup your birthday reminder"));
+  }
+  if (props.hasBeenNotified) {
+    return /* @__PURE__ */ createElement(Fragment, null, /* @__PURE__ */ createElement("p", {
       id: "when-next-birthday",
       "data-date": props.settings?.birthDay.toISOString()
-    }, "Your birthday is: ", showUTCDate(props.settings.birthDay)), /* @__PURE__ */ createElement(Link, {
-      href: "/settings",
-      onClick: () => {
-        console.log("dispatch change to settings");
-        props.dispatch({type: appActionType.SWITCH_TO_SETTINGS});
-      }
-    }, /* @__PURE__ */ createElement("a", {
-      className: "btn",
-      id: "settings-setup-btn"
-    }, "Change Reminder")));
-  } else {
-    return /* @__PURE__ */ createElement(Fragment, null, /* @__PURE__ */ createElement("section", {
-      id: "no-settings-greeting"
-    }, /* @__PURE__ */ createElement("p", {
-      id: "home-greeting"
-    }, "Welcome! It looks like you haven't setup your birthday reminder yet."), /* @__PURE__ */ createElement(Link, {
-      href: "/settings",
-      onClick: () => {
-        console.log("dispatch change to settings");
-        props.dispatch({type: appActionType.SWITCH_TO_SETTINGS});
-      }
-    }, /* @__PURE__ */ createElement("a", {
-      className: "btn",
-      id: "settings-setup-btn"
-    }, "Setup Reminder"))));
+    }, "Your birthday reminder for ", /* @__PURE__ */ createElement("br", null), showUTCDate(props.settings.birthDay), " ", /* @__PURE__ */ createElement("br", null), " has already been shown"));
   }
+  return /* @__PURE__ */ createElement(Fragment, null, /* @__PURE__ */ createElement("p", {
+    id: "when-next-birthday",
+    "data-date": props.settings?.birthDay.toISOString()
+  }, "Your birthday reminder will show on: ", /* @__PURE__ */ createElement("br", null), showUTCDate(props.settings.birthDay)), props.hasBeenNotified && /* @__PURE__ */ createElement("p", null, "Setup a new reminder"));
 };
 
 // routes.js
@@ -7397,14 +7455,15 @@ var navRoutes = [
 ];
 
 // NavBar.js
-var NavBar = ({routes, appDispatch}) => {
+var NavBar = ({routes}) => {
   const [location2, setLocation] = useHashLocation();
   const activeLinkProps = {
     "aria-current": "page"
   };
   function renderedRoutes() {
     return routes.map((route) => /* @__PURE__ */ createElement(Link, {
-      href: route.path
+      href: route.path,
+      key: route.id
     }, /* @__PURE__ */ createElement("a", {
       id: route.id,
       ...route.path === location2 ? activeLinkProps : {},
@@ -7416,36 +7475,28 @@ var NavBar = ({routes, appDispatch}) => {
 
 // App.js
 var App = () => {
-  const initialAppState = {settings: {birthDay: null}, status: appStatus.LOADING, warnStorage: false};
+  const initialAppState = {
+    settings: {birthDay: null},
+    hasBeenNotified: false,
+    isLoaded: false,
+    warnStorage: false
+  };
   const [state, appDispatch] = useReducer(appReducer, initialAppState);
   useEffect(() => {
-    getDateFromStorage().then((settings) => {
-      console.debug("got birthDay setting from idb");
-      console.debug(settings);
-      appDispatch({type: appActionType.SAVE, payload: {settings}});
+    getAllStateFromStorage().then((data) => {
+      console.debug("got reminder app state from idb", data);
+      appDispatch({type: appActionType.SAVE, payload: data});
     }).catch((err) => {
       console.error(`Unhandled error when setting key with indexedDB: ${err.name}`);
-      appDispatch({type: appActionType.EnableStorageFailureWarning});
-      appDispatch({type: appActionType.HOME, payload: initialAppState.settings});
+      appDispatch({type: appActionType.ENABLE_STORAGE_FAILURE_WARNING});
+      appDispatch({type: appActionType.SAVE, payload: initialAppState});
       throw err;
+    }).then(() => {
+      appDispatch({type: appActionType.DONE_LOADING});
     });
   }, []);
-  const [location2, setLocation] = useHashLocation();
-  useEffect(() => {
-    console.log(`status changed: ${state.status}, current route - ${location2}`);
-    switch (location2) {
-      case appRoutes.SETTINGS:
-        appDispatch({type: appActionType.SWITCH_TO_SETTINGS});
-        break;
-      case appRoutes.HOME:
-        appDispatch({type: appActionType.SWITCH_TO_HOME});
-        break;
-    }
-    console.log(`new status: ${state.status} - current route - ${location2}`);
-  }, [state.status]);
-  console.debug("app state");
-  console.debug(state);
-  if (state.status === appStatus.LOADING) {
+  console.debug("app state\n", state);
+  if (state.isLoaded === false) {
     console.debug("app in loading state");
     return null;
   }
@@ -7465,21 +7516,26 @@ var App = () => {
   }), /* @__PURE__ */ createElement(Route, {
     path: appRoutes.HOME
   }, () => {
-    const settings = state.settings;
     return /* @__PURE__ */ createElement(Home, {
-      settings,
+      settings: state.settings,
+      hasBeenNotified: state.hasBeenNotified,
       dispatch: appDispatch,
       debug: state
     });
   }), /* @__PURE__ */ createElement(Route, null, "404, Page Not Found!")), " "));
 };
-function getDateFromStorage() {
-  return get("date-iso").then((day) => {
-    console.debug(`Got day from idb init: ${day}`);
-    return {birthDay: day};
-  }).catch((err) => {
-    console.warning("Failed to get date from local storage");
-  });
+async function getAllStateFromStorage() {
+  let data = {
+    settings: {birthDay: null}
+  };
+  try {
+    data.settings.birthDay = await get("date-iso");
+    data.hasBeenNotified = await get("notify");
+    return data;
+  } catch (err) {
+    console.error("Failed to get date from offline storage", JSON.stringify(err));
+    throw err;
+  }
 }
 var warningStyle = {
   backgroundColor: "#9c2b2e",
