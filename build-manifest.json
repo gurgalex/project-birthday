@@ -61,7 +61,7 @@
       "imports": []
     },
     "Settings.js": {
-      "bytes": 3049,
+      "bytes": 3137,
       "imports": [
         {
           "path": "_snowpack/pkg/react.js",
@@ -90,7 +90,7 @@
       ]
     },
     "Home.js": {
-      "bytes": 4875,
+      "bytes": 4990,
       "imports": [
         {
           "path": "_snowpack/pkg/wouter.js",
@@ -246,10 +246,10 @@
           "bytesInOutput": 95
         },
         "Settings.js": {
-          "bytesInOutput": 2653
+          "bytesInOutput": 2741
         },
         "Home.js": {
-          "bytesInOutput": 4425
+          "bytesInOutput": 4534
         },
         "routes.js": {
           "bytesInOutput": 334
@@ -264,7 +264,7 @@
           "bytesInOutput": 125
         }
       },
-      "bytes": 220395
+      "bytes": 220592
     }
   }
 }

@@ -7277,22 +7277,25 @@ var Settings = (props) => {
     document.getElementById("set-birthday").focus();
     return () => settingFormElement.removeEventListener("submit", handleFormSubmit);
   }, []);
-  const handleFormSubmit = (event) => {
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
     event.stopPropagation();
     const birthDayInput = document.getElementById("set-birthday");
     const birthDay = birthDayInput.valueAsDate;
-    set("date-iso", birthDay).then((res) => {
+    try {
+      await set("date-iso", birthDay);
       console.debug("Set birthDay in idb");
+      await set("notify", false);
+      console.debug("Set notify to false in idb");
       props.dispatch({type: appActionType.SAVE, payload: {settings: {birthDay}}});
       props.dispatch({type: appActionType.SHOULD_NOTIFY_USER, payload: {notified: false}});
       console.debug("Set birthDay in app");
       setFilled(true);
       console.debug("form marked as filled in settings");
-    }).catch((err) => {
+    } catch (err) {
       switch (err.name) {
         case "QuotaExceededError":
-          console.warn(`${err.name}: Failed to persist birthday in idb`);
+          console.warn(`${err.name}: Failed to persist settings in idb`);
           props.dispatch({type: appActionType.ENABLE_STORAGE_FAILURE_WARNING});
           break;
         default:
@@ -7300,7 +7303,7 @@ var Settings = (props) => {
           console.error(JSON.stringify(err));
           throw err;
       }
-    });
+    }
   };
   if (filled) {
     return /* @__PURE__ */ createElement(Redirect, {
@@ -7327,11 +7330,12 @@ var Settings = (props) => {
 var Home = (props) => {
   console.debug("homepage attached");
   console.debug("main page initial props:", props);
-  function saveNotify() {
-    set("notify", true).then((res) => {
+  const saveNotify = async () => {
+    try {
+      await set("notify", true);
       props.dispatch({type: appActionType.SHOULD_NOTIFY_USER, payload: {notified: true}});
       console.debug("Saved that we notified the user already. Persisted to idb");
-    }).catch((err) => {
+    } catch (err) {
       switch (err.name) {
         case "QuotaExceededError":
           console.warn(`${err.name}: Failed to persist that we notified the user in idb`);
@@ -7342,8 +7346,8 @@ var Home = (props) => {
           console.error(JSON.stringify(err));
           throw err;
       }
-    });
-  }
+    }
+  };
   useEffect(() => {
     const birthDayCheckInternval = setInterval(() => {
       const today = new Date();
@@ -7352,8 +7356,9 @@ var Home = (props) => {
       }
       if (today >= props.settings?.birthDay) {
         new Notification("Birthday Reminder", {body: `Your birthday is soon`});
-        saveNotify();
-        return;
+        saveNotify().then((r) => {
+          return;
+        });
       }
     }, 1e3);
     return () => clearInterval(birthDayCheckInternval);
@@ -7426,7 +7431,9 @@ var RenderReminder = (props) => {
     return /* @__PURE__ */ createElement(Fragment, null, /* @__PURE__ */ createElement("p", {
       id: "when-next-birthday",
       "data-date": props.settings?.birthDay.toISOString()
-    }, "Your birthday reminder for ", /* @__PURE__ */ createElement("br", null), showUTCDate(props.settings.birthDay), " ", /* @__PURE__ */ createElement("br", null), " has already been shown"));
+    }, "Your birthday reminder for", /* @__PURE__ */ createElement("br", null), showUTCDate(props.settings.birthDay), /* @__PURE__ */ createElement("br", null), /* @__PURE__ */ createElement("div", {
+      id: "reminder-shown-already"
+    }, "has already been shown")));
   }
   return /* @__PURE__ */ createElement(Fragment, null, /* @__PURE__ */ createElement("p", {
     id: "when-next-birthday",
