@@ -12,12 +12,12 @@ export const Home = (props: Partial<appProps>) => {
     console.debug("homepage attached");
     console.debug("main page initial props:", props);
 
-    function saveNotify() {
-        set('notify', true).then(res => {
+    const saveNotify = async () => {
+        try {
+            await set('notify', true)
             props.dispatch({type: appActionType.SHOULD_NOTIFY_USER, payload: {notified: true}});
             console.debug("Saved that we notified the user already. Persisted to idb");
-            }
-        ).catch(err => {
+        } catch (err) {
             switch (err.name) {
                 case 'QuotaExceededError':
                     console.warn(`${err.name}: Failed to persist that we notified the user in idb`);
@@ -28,8 +28,8 @@ export const Home = (props: Partial<appProps>) => {
                     console.error(JSON.stringify(err));
                     throw err;
             }
-        });
-    }
+        }
+    };
 
     useEffect(() => {
         const birthDayCheckInternval = setInterval(() => {
@@ -40,8 +40,7 @@ export const Home = (props: Partial<appProps>) => {
 
             if (today >= props.settings?.birthDay) {
                 new Notification("Birthday Reminder", {body: `Your birthday is soon`})
-                saveNotify();
-                return;
+                saveNotify().then(r => {return;});
             }
         }, 1000);
         return () => clearInterval(birthDayCheckInternval);
@@ -132,12 +131,15 @@ const RenderReminder = (props) => {
     }
     if (props.hasBeenNotified) {
         return <>
-            <p id="when-next-birthday" data-date={props.settings?.birthDay.toISOString()}>Your birthday reminder for <br />{showUTCDate(props.settings.birthDay)} <br /> has already been shown</p>
+            <p id="when-next-birthday" data-date={props.settings?.birthDay.toISOString()}>
+                Your birthday reminder for<br />{showUTCDate(props.settings.birthDay)}<br />
+                <div id="reminder-shown-already">has already been shown</div></p>
         </>
     }
     return (
         <>
-            <p id="when-next-birthday" data-date={props.settings?.birthDay.toISOString()}>Your birthday reminder will show on: <br />{showUTCDate(props.settings.birthDay)}</p>
+            <p id="when-next-birthday" data-date={props.settings?.birthDay.toISOString()}>Your birthday reminder will
+                show on: <br/>{showUTCDate(props.settings.birthDay)}</p>
             {props.hasBeenNotified && <p>Setup a new reminder</p>}
         </>
     )

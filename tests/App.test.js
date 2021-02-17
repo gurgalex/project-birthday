@@ -113,11 +113,39 @@ describe('App', function() {
         currentDayOnly.setUTCHours(0,0,0,0);
 
         await changeSettingsPage.fillInBirthDay(currentDayOnly);
-        let home = await changeSettingsPage.submitBirthDay();
+        let home = await changeSettingsPage.submitBirthDayReminder();
         let homeDateString = await home.getBirthdayReminderISODate();
         await expect(page.url()).to.eq(site.home);
         expect(await home.navHeader.activeNavID()).to.eq(NavHeader.homeNavID);
         expect(homeDateString).to.eq(currentDayOnly.toISOString());
-
     });
-})
+
+    it("Refreshing the homepage with a far out reminder still shows it as upcoming", async () => {
+        const changeSettingsPage = new SettingsPage(page);
+        await changeSettingsPage.go();
+        let oldYear = new Date();
+        oldYear.setFullYear(1910);
+        oldYear.setUTCHours(0, 0, 0, 0);
+        await changeSettingsPage.fillInBirthDay(oldYear);
+        let home = await changeSettingsPage.submitBirthDayReminder();
+        // Wait for notification to trigger
+        await home.page.waitForTimeout(2500);
+        let reminderPast = await home.pastReminder();
+        expect(reminderPast).to.not.be.null;
+
+
+        await changeSettingsPage.go();
+        let farOutReminder = new Date();
+        farOutReminder.setFullYear(2022);
+        farOutReminder.setUTCHours(0, 0, 0, 0);
+        await changeSettingsPage.fillInBirthDay(farOutReminder);
+        home = await changeSettingsPage.submitBirthDayReminder();
+        await home.page.waitForTimeout(1500);
+
+        // Refresh page to reload state from offline storage
+        await home.go();
+        reminderPast = await home.pastReminder();
+        await home.getBirthdayReminderISODate();
+        expect(reminderPast).to.be.null;
+    })
+});
