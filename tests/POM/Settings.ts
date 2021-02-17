@@ -2,7 +2,9 @@ import {Page} from "puppeteer";
 import NavPage from "./Nav";
 import HomePage from "./Home";
 
+
 export class SettingsPage {
+    static route = "/#/settings";
     static headerID = "settings-header";
     static birthdayInputID = "set-birthday";
     static selector = {
@@ -18,7 +20,9 @@ export class SettingsPage {
     }
 
     async go() {
+        await this.page.goto(process.env.SITE_URL + SettingsPage.route);
         await this.page.waitForSelector(SettingsPage.selector.header);
+
     }
 
     async settingsFormBirthdayElement() {
@@ -37,7 +41,7 @@ export class SettingsPage {
         await page.$eval(SettingsPage.selector.birthdayInput, (el, value) => el.value = value, dateOnly);
     }
 
-    async submitBirthDay(): Promise<HomePage> {
+    async submitBirthDayReminder(): Promise<HomePage> {
         let setBirthdayInput = await this.settingsFormBirthdayElement();
         if (setBirthdayInput == null) {
             throw Error(`The form field with id ${SettingsPage.birthdayInputID} is missing`);

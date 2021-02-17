@@ -31,24 +31,28 @@ export const Settings = (props) => {
         return () => settingFormElement.removeEventListener('submit', handleFormSubmit);
     }, []);
 
-    const handleFormSubmit = (event) => {
+    const handleFormSubmit = async (event) => {
         event.preventDefault();
         event.stopPropagation();
         const birthDayInput = document.getElementById('set-birthday') as HTMLInputElement;
         const birthDay = birthDayInput.valueAsDate;
 
-        set('date-iso', birthDay).then(res => {
-                console.debug("Set birthDay in idb");
-                props.dispatch({type: appActionType.SAVE, payload: {settings: {birthDay: birthDay}}});
-                props.dispatch({type: appActionType.SHOULD_NOTIFY_USER, payload: {notified: false}});
-                console.debug("Set birthDay in app");
-                setFilled(true);
-                console.debug("form marked as filled in settings");
-            }
-        ).catch(err => {
+        try {
+            await set('date-iso', birthDay);
+            console.debug("Set birthDay in idb");
+
+            await set("notify", false);
+            console.debug("Set notify to false in idb");
+            props.dispatch({type: appActionType.SAVE, payload: {settings: {birthDay: birthDay}}});
+            props.dispatch({type: appActionType.SHOULD_NOTIFY_USER, payload: {notified: false}});
+            console.debug("Set birthDay in app");
+            setFilled(true);
+            console.debug("form marked as filled in settings");
+        }
+        catch (err) {
             switch (err.name) {
                 case 'QuotaExceededError':
-                    console.warn(`${err.name}: Failed to persist birthday in idb`);
+                    console.warn(`${err.name}: Failed to persist settings in idb`);
                     props.dispatch({type: appActionType.ENABLE_STORAGE_FAILURE_WARNING});
                     break;
                 default:
@@ -56,7 +60,7 @@ export const Settings = (props) => {
                     console.error(JSON.stringify(err));
                     throw err;
             }
-        });
+        }
     };
 
     if (filled) {

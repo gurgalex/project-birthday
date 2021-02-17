@@ -9,14 +9,16 @@ export default class HomePage {
     static settingsSetupID = "settings-setup-btn";
     static firstTimeSetupID = "first-time-setup";
     static nextBirthdayReminderID = "when-next-birthday";
+    static pastReminderID = "reminder-shown-already";
     static query = {
         homeGreeting: `#${HomePage.homeGreetingID}`,
         firstTimeSetupGreeting: `#${HomePage.firstTimeSetupID}`,
         settingsSetupBtn: `#${HomePage.settingsSetupID}`,
         notificationConsentBtn: `#${HomePage.notificationConsentID}`,
         nextBirthdayReminder: `#${HomePage.nextBirthdayReminderID}`,
+        pastReminder: `#${HomePage.pastReminderID}`,
     }
-    private readonly page: Page;
+    readonly page: Page;
     public navHeader: NavPage;
     constructor(page: Page) {
         this.page = page;
@@ -47,5 +49,9 @@ export default class HomePage {
         let homeWhenBirthday = await this.page.$(HomePage.query.nextBirthdayReminder);
         // @ts-ignore
         return await homeWhenBirthday.evaluate(el => el.dataset.date);
+    }
+
+    async pastReminder() {
+        return await this.page.$(HomePage.query.pastReminder);
     }
 }
