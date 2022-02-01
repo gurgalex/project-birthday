@@ -1,5 +1,8 @@
 # Project Birthday
 Get notified in the browser when your next birthday is.
+
+[live demo](https://gurgalex.github.io/project-birthday/)
+
 ## Technology used in this project
 * IndexeDB: Client side offline local storage of settings
 * Browser notifications: For notifying user of birthday
