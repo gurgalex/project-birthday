@@ -11,7 +11,7 @@ Get notified in the browser when your next birthday is.
   - useRedux
     - A new way to organize state changes
   - useEffect - used in functional components
-    - Needing to dd/remove event handlers
+    - Cleanup of event handlers
     - Retrieving data from indexedDB
    - Router
      - Have a specific component render to an assigned URL
